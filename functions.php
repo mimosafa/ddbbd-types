@@ -52,10 +52,10 @@ if ( ! function_exists( '_ddbbd_register_classloader' ) ) {
 	 * @param  string $path
 	 * @return void
 	 */
-	function _ddbbd_register_classloader( $namespace ) {
+	function _ddbbd_register_classloader( $namespace, $path = null, $flags = 0 ) {
 		if ( ! class_exists( 'DDBBD\\ClassLoader' ) )
 			require_once 'classloader.php';
-		DDBBD\ClassLoader::register( $namespace );
+		DDBBD\ClassLoader::register( $namespace, $path, $flags );
 	}
 }
 

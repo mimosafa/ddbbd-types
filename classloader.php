@@ -1,22 +1,39 @@
 <?php
 namespace DDBBD;
 
+/**
+ *
+ */
 class ClassLoader {
 
+	/**
+	 * @var string
+	 */
 	private $namespace;
 	private $path;
 
 	private $sep = '\\';
 
-	public static function register( $namespace ) {
-		$self = new self( $namespace );
+	/**
+	 * @access public
+	 */
+	public static function register( $namespace, $path = null, $flags = 0 ) {
+		$self = new self( $namespace, $path, $flags );
 		$self->_autoload_register();
 	}
 
-	private function __construct( $namespace ) {
+	/**
+	 * Constructor
+	 *
+	 * @access private
+	 */
+	private function __construct( $namespace, $path, $flags ) {
 		$this->namespace = $namespace;
-		$this->path  = trailingslashit( WP_PLUGIN_DIR );
-		$this->path .= str_replace( '\\', '-', trim( $this->namespace, '\\' ) );
+		if ( ! $path ) {
+			$path  = trailingslashit( WP_PLUGIN_DIR );
+			$path .= str_replace( '\\', '-', trim( $this->namespace, '\\' ) );
+		}
+		$this->path = trailingslashit( $path );
 	}
 
 	private function _autoload_register() {
@@ -38,7 +55,7 @@ class ClassLoader {
 			$file = str_replace( [ '_', $sep ], [ '-', '/' ], $subNs );
 		}
 		$file .= str_replace( '_', '-', $class ) . '.php';
-		$file = $this->path . '/' . $file;
+		$file = $this->path . $file;
 
 		if ( file_exists( $file ) )
 			require_once $file;
