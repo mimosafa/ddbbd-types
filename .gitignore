@@ -1,9 +1,0 @@
-/*
-!/.gitignore
-
-# Common files
-!/LICENCE
-!/ddbbd-name.php.template
-!/lib/classloader.php
-!/lib/singleton.php
-!/inc/functions.php

@@ -25,7 +25,7 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 	 * @param  string $wpReq  Required WordPress Ver.
 	 * @return boolean
 	 */
-	function _ddbbd_plugin_requirements( $file, $plugin, $phpReq = null, $wpReq = null ) {
+	function _ddbbd_plugin_requirements( $file, $phpReq = null, $wpReq = null ) {
 		$e = new WP_Error();
 
 		// Required Ver.

@@ -1,9 +1,9 @@
 <?php
 /**
- * Plugin Name: Dana Don-Boom-Boom-Doo {%= subtitle %}
- * Plugin URI:  https://github.com/dana-don-boom-boom-doo/ddbbd-{%= subname %}
- * Description: {%= description %}
- * Version:     {%= version %}
+ * Plugin Name: Dana Don-Boom-Boom-Doo Types
+ * Plugin URI:  https://github.com/dana-don-boom-boom-doo/ddbbd-types
+ * Description: Manage WordPress Custom Contents as Custom Post Types, Custom Taxonomies, and Custom Endpoints.
+ * Version:     0.0.0
  * Author:      Toshimichi Mimoto
  * Author URI:  http://mimosafa.me
  */
