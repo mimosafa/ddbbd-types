@@ -27,18 +27,21 @@
  */
 
 define( 'DDBBD_FILE', __FILE__ );
+define( 'DDBBD_DIR', dirname( DDBBD_FILE ) );
+
 if ( ! defined( 'DDBBD_NAME' ) )
 	define( 'DDBBD_NAME', 'Dana Don-Boom-Boom-Doo' );
 
 if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
-	require_once 'functions.php';
+	require_once 'inc/functions.php';
 
-// Verify environment system version ( PHP: >=5.4.0, WordPress: >=4.2 )
-if ( ! _ddbbd_plugin_requirements( DDBBD_FILE, DDBBD_NAME, '5.4.0', '4.2' ) )
+if ( ! _ddbbd_plugin_requirements( DDBBD_FILE, DDBBD_NAME ) )
 	return;
 
-// Register ClassLoader
-_ddbbd_register_classloader( 'DDBBD' );
+if ( ! class_exists( 'DDBBD\\ClassLoader' ) )
+	require_once 'lib/classloader.php';
+
+_ddbbd_register_classloader( 'DDBBD', DDBBD_DIR . '/lib' );
 
 require_once 'bootstrap.php';
 _ddbbd_plugin_init();

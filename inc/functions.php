@@ -9,6 +9,12 @@
 if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
 	define( 'DDBBD_FUNCTIONS_INCLUDED', 1 );
 
+if ( ! defined( 'DDBBD_REQUWIRED_PHP_VER' ) )
+	define( 'DDBBD_REQUWIRED_PHP_VER', '5.4.0' );
+
+if ( ! defined( 'DDBBD_REQUWIRED_WP_VER' ) )
+	define( 'DDBBD_REQUWIRED_WP_VER', '4.1' );
+
 if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 	/**
 	 * Plugin's requirements check
@@ -19,8 +25,12 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 	 * @param  string $wpReq  Required WordPress Ver.
 	 * @return boolean
 	 */
-	function _ddbbd_plugin_requirements( $file, $plugin, $phpReq, $wpReq ) {
+	function _ddbbd_plugin_requirements( $file, $plugin, $phpReq = null, $wpReq = null ) {
 		$e = new WP_Error();
+
+		// Required Ver.
+		$phpReq = $phpReq ?: DDBBD_REQUWIRED_PHP_VER;
+		$wpReq  = $wpReq  ?: DDBBD_REQUWIRED_WP_VER;
 
 		// Current Ver.
 		$phpEnv = PHP_VERSION;
@@ -52,10 +62,13 @@ if ( ! function_exists( '_ddbbd_register_classloader' ) ) {
 	 * @param  string $path
 	 * @return void
 	 */
-	function _ddbbd_register_classloader( $namespace, $path = null, $flags = 0 ) {
-		if ( ! class_exists( 'DDBBD\\ClassLoader' ) )
-			require_once 'classloader.php';
-		DDBBD\ClassLoader::register( $namespace, $path, $flags );
+	function _ddbbd_register_classloader( $namespace, $path = null, $options = null ) {
+		if ( ! $path ) {
+			$path  = trailingslashit( WP_PLUGIN_DIR );
+			$path .= str_replace( '\\', '-', trim( $namespace, '\\' ) );
+		}
+		if ( class_exists( 'DDBBD\\ClassLoader' ) )
+			DDBBD\ClassLoader::register( $namespace, $path, $options );
 	}
 }
 
