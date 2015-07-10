@@ -13,6 +13,11 @@ namespace DDBBD\Types;
  */
 class Register {
 
+	/**
+	 * Singleton pattern
+	 *
+	 * @uses DDBD\Singleton
+	 */
 	use \DDBBD\Singleton;
 
 	/**
@@ -106,7 +111,7 @@ class Register {
 	 *
 	 * @access private
 	 */
-	protected function __construct() {
+	private function __construct() {
 		add_action( 'init', [ &$this, 'register_taxonomies' ],   1 );
 		add_action( 'init', [ &$this, 'register_post_types' ],   1 );
 		add_action( 'init', [ &$this, 'add_rewrite_endpoints' ], 1 );
@@ -144,7 +149,7 @@ class Register {
 			if ( $this->taxonomies ) {
 				$taxonomies = isset( $args['taxonomies'] ) ? (array) $args['taxonomies'] : [];
 				foreach ( $this->taxonomies as $tax ) {
-					if ( in_array( $post_type, (array) $tax['post_types'], true ) )
+					if ( in_array( $post_type, (array) $tax['object_type'], true ) )
 						$taxonomies[] = $tax['taxonomy'];
 				}
 				if ( $taxonomies )
@@ -166,7 +171,21 @@ class Register {
 	public function register_taxonomies() {
 		if ( ! $this->taxonomies )
 			return;
-		// ~
+		
+		foreach ( $this->taxonomies as $array ) {
+			/**
+			 * @var string       $taxonomy
+			 * @var string|array $object_type
+			 * @var array        $args
+			 */
+			extract( $array );
+
+			/**
+			 * @todo
+			 */
+
+			register_taxonomy( $taxonomy, $object_type, $args );
+		}
 	}
 
 	/**
