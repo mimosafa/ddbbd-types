@@ -15,7 +15,7 @@ trait Singleton {
 		return $instance ?: $instance = new $class();
 	}
 
-	protected function __constract()
+	private function __constract()
 	{
 		// Do nothing ( Overwrite, if Necessary )
 	}
@@ -25,7 +25,8 @@ trait Singleton {
 		// Do nothing
 	}
 
-	public function __wakeup() {
+	public function __wakeup()
+	{
 		// Do nothing
 	}
 
