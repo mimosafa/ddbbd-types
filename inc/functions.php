@@ -20,7 +20,6 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 	 * Plugin's requirements check
 	 *
 	 * @param  string $file   Plugin's file path
-	 * @param  string $plugin Plugin's name
 	 * @param  string $phpReq Required PHP Ver.
 	 * @param  string $wpReq  Required WordPress Ver.
 	 * @return boolean
@@ -69,25 +68,5 @@ if ( ! function_exists( '_ddbbd_register_classloader' ) ) {
 		}
 		if ( class_exists( 'DDBBD\\ClassLoader' ) )
 			DDBBD\ClassLoader::register( $namespace, $path, $options );
-	}
-}
-
-if ( ! function_exists( '_ddbbd_plugins_settings_ui' ) ) {
-	/**
-	 * DDBBD plugins settings UI
-	 */
-	function _ddbbd_plugins_settings_ui() {
-		if ( class_exists( 'DDBBD\\Settings\\Page' ) )
-			do_action( '_ddbbd_plugins_settings' );
-	}
-}
-
-if ( ! function_exists( '_ddbbd_plugin_init' ) ) {
-	/**
-	 * DDBBD Plugin bootstrap
-	 */
-	function _ddbbd_plugin_init() {
-		if ( class_exists( 'DDBBD\\Bootstrap' ) )
-			DDBBD\Bootstrap::init();
 	}
 }
