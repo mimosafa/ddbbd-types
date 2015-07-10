@@ -1,4 +1,4 @@
 /*
 !/.gitignore
-!/classloader.php
-!/functions.php
+!/lib/classloader.php
+!/inc/functions.php
