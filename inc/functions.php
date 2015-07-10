@@ -81,13 +81,3 @@ if ( ! function_exists( '_ddbbd_plugins_settings_ui' ) ) {
 			do_action( '_ddbbd_plugins_settings' );
 	}
 }
-
-if ( ! function_exists( '_ddbbd_plugin_init' ) ) {
-	/**
-	 * DDBBD Plugin bootstrap
-	 */
-	function _ddbbd_plugin_init() {
-		if ( class_exists( 'DDBBD\\Bootstrap' ) )
-			DDBBD\Bootstrap::init();
-	}
-}

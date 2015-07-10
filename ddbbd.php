@@ -38,10 +38,9 @@ if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
 if ( ! _ddbbd_plugin_requirements( DDBBD_FILE, DDBBD_NAME ) )
 	return;
 
-if ( ! class_exists( 'DDBBD\\ClassLoader' ) )
+if ( ! class_exists( 'DDBBD\\ClassLoader' ) ) {
 	require_once 'lib/classloader.php';
-
-_ddbbd_register_classloader( 'DDBBD', DDBBD_DIR . '/lib' );
+	_ddbbd_register_classloader( 'DDBBD', DDBBD_DIR . '/lib' );
+}
 
 require_once 'bootstrap.php';
-_ddbbd_plugin_init();

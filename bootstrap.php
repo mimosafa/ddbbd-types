@@ -1,9 +1,8 @@
 <?php
-namespace DDBBD;
-
-use DDBBD\ClassLoader as cl;
-
-class Bootstrap {
+/**
+ *
+ */
+class DDBBD {
 
 	public static function init() {
 		$page = new Settings_Page( 'ddbbd' );
