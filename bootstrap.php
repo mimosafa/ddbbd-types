@@ -24,7 +24,6 @@ class DanaDonBoomBoomDoo_Types {
 		//
 		register_activation_hook( DDBBD_TYPES_FILE, [ &$this, '_activation' ] );
 		register_deactivation_hook( DDBBD_TYPES_FILE, [ &$this, '_deactivation' ] );
-		register_uninstall_hook( DDBBD_TYPES_FILE, [ &$this, '_uninstall' ] );
 	}
 
 	/**
@@ -39,13 +38,6 @@ class DanaDonBoomBoomDoo_Types {
 	 */
 	public function _deactivation() {
 		//
-	}
-
-	/**
-	 * @access private
-	 */
-	public function _uninstall() {
-		$this->_deactivation();
 	}
 
 }
