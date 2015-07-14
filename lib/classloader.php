@@ -114,17 +114,19 @@ class ClassLoader {
 	 * @param  array $options {
 	 *     @type boolean $hyphenate_classname
 	 *     @type boolean $hyphenate_namespace
+	 *     @type boolean $decamelize_classname
+	 *     @type boolean $decamelize_namespace
 	 * }
 	 */
 	private function _set_options( Array $options ) {
 		static $def;
 		if ( ! $def ) {
-			$isBool = [ 'filter' => \FILTER_VALIDATE_BOOLEAN, 'flags' => \FILTER_NULL_ON_FAILURE ];
+			$boolFilter = [ 'filter' => \FILTER_VALIDATE_BOOLEAN, 'flags' => \FILTER_NULL_ON_FAILURE ];
 			$def = [
-				'hyphenate_classname'  => $isBool,
-				'hyphenate_namespace'  => $isBool,
-				'decamelize_classname' => $isBool,
-				'decamelize_namespace' => $isBool,
+				'hyphenate_classname'  => $boolFilter,
+				'hyphenate_namespace'  => $boolFilter,
+				'decamelize_classname' => $boolFilter,
+				'decamelize_namespace' => $boolFilter,
 			];
 		}
 		$options = filter_var_array( $options, $def );
