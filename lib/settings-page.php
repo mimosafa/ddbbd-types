@@ -166,8 +166,10 @@ class Settings_Page {
 		if ( ! doing_action( 'admin_menu' ) || ! $this->pages )
 			return;
 		foreach ( $this->pages as $page ) {
-			$this->_add_page( $page, $this->toplevel );
+			$this->_add_page( $page );
 		}
+
+		do_action( '_ddbbd_settings_page_added_pages' );
 	}
 
 	/**
@@ -181,7 +183,7 @@ class Settings_Page {
 	 * @param  string $toplevel
 	 * @return (void)
 	 */
-	private function _add_page( $page_arg, $toplevel ) {
+	private function _add_page( $page_arg ) {
 		if ( ! array_key_exists( 'page', $page_arg ) )
 			return;
 
@@ -207,12 +209,23 @@ class Settings_Page {
 			$page_arg['capability'] = $capability;
 		}
 
-		if ( ! isset( $callback ) )
-			$callback = [ &$this, 'page_body' ];
+		if ( ! isset( $callback ) ) {
+			if ( isset( $sections ) || isset( $fields ) || isset( $html ) || isset( $description ) ) {
+				$callback = [ &$this, 'page_body' ];
+			} else if ( $page === $this->toplevel && count( $this->pages ) > 1 ) {
+				$callback = '';
+				// Remove submenu
+				add_action( '_ddbbd_settings_page_added_pages', function() {
+					remove_submenu_page( $this->toplevel, $this->toplevel );
+				} );
+			} else {
+				return;
+			}
+		}
 		else
 			unset( $page_arg['callback'] ); // Optimize vars
 
-		if ( $page === $toplevel && ! array_key_exists( $page, $admin_page_hooks ) ) {
+		if ( $page === $this->toplevel && ! array_key_exists( $page, $admin_page_hooks ) ) {
 
 			if ( ! isset( $icon_url ) )
 				$icon_url = '';
@@ -229,7 +242,7 @@ class Settings_Page {
 			/**
 			 * Add as sub page
 			 */
-			add_submenu_page( $toplevel, $title, $menu_title, $capability, $page, $callback );
+			add_submenu_page( $this->toplevel, $title, $menu_title, $capability, $page, $callback );
 		}
 
 		/**
@@ -371,7 +384,7 @@ class Settings_Page {
 	 */
 	private function _page( $page = null, $page_title = null, $menu_title = null ) {
 		if ( $page === null && ! $this->toplevel )
-			$page = 'options.php';
+			$page = 'options-general.php';
 
 		if ( ! $page = filter_var( $page ) )
 			return;

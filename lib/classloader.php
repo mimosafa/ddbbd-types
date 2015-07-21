@@ -127,6 +127,7 @@ class ClassLoader {
 				'hyphenate_namespace'  => $boolFilter,
 				'decamelize_classname' => $boolFilter,
 				'decamelize_namespace' => $boolFilter,
+				'file_prefix' => [ 'filter' => \FILTER_VALIDATE_REGEXP, 'options' => [ 'regexp' => '/\A[a-z][a-z0-9_\-]*\z/' ] ],
 			];
 		}
 		$options = filter_var_array( $options, $def );
@@ -143,6 +144,9 @@ class ClassLoader {
 
 		if ( isset( $decamelize_namespace ) )
 			$this->nsDecamelize = $decamelize_namespace;
+
+		if ( isset( $file_prefix ) )
+			$this->filePrefix = $file_prefix;
 	}
 
 	/**
@@ -176,10 +180,9 @@ class ClassLoader {
 
 			$file = str_replace( $search, $replace, $subNs ) . '/';
 		}
-		
+		$file .= $this->filePrefix;
 		$file .= $this->cnHypenate ? str_replace( '_', '-', $class ) : $class;
-		$file .= '.php';
-		$file  = $this->path . $file;
+		$file  = $this->path . $file . '.php';
 
 		if ( file_exists( $file ) )
 			require_once $file;
