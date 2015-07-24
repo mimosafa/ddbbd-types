@@ -10,7 +10,7 @@ class Settings {
 	private $page;
 
 	protected function __construct() {
-		var_dump( class_exists( 'DanaDonBoomBoomDoo' ) );
+		#var_dump( class_exists( 'DanaDonBoomBoomDoo' ) );
 	}
 
 }

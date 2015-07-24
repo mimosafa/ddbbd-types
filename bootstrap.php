@@ -7,18 +7,6 @@
  * @author     Toshimichi Mimoto
  */
 
-define( 'DDBBD_TYPES_DIR',  dirname( __FILE__ ) );
-define( 'DDBBD_TYPES_FILE', DDBBD_TYPES_DIR . '/ddbbd-types.php' );
-define( 'DDBBD_TYPES_INC', DDBBD_TYPES_DIR . '/inc' );
-
-/**
- * Register ClassLoader for DDBBD Types libraries
- */
-_ddbbd_register_classloader( 'DDBBD\\Types', DDBBD_TYPES_DIR . '/lib/types' );
-
-/**
- * Bootstrap
- */
 add_action( 'plugins_loaded', 'DanaDonBoomBoomDoo_Types::getInstance' );
 
 /**

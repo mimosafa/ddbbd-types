@@ -30,7 +30,8 @@ class ClassLoader {
 	 *
 	 * @var boolean
 	 */
-	private $cnHypenate = true;
+	private $cnHyphenate = false;
+
 	/**
 	 * - Hyphenate Namespace
 	 * - e.g.
@@ -39,7 +40,8 @@ class ClassLoader {
 	 *
 	 * @var boolean
 	 */
-	private $nsHyphenate = true;
+	private $nsHyphenate = false;
+
 	/**
 	 * - Decamelize Classname
 	 * - e.g.
@@ -51,6 +53,7 @@ class ClassLoader {
 	 * @var boolean
 	 */
 	private $cnDecamelize = false;
+
 	/**
 	 * - Decamelize Namespace
 	 * - e.g.
@@ -62,6 +65,7 @@ class ClassLoader {
 	 * @var boolean
 	 */
 	private $nsDecamelize = false;
+
 	/**
 	 * - Add prefix to filename
 	 * - e.g.
@@ -133,11 +137,11 @@ class ClassLoader {
 		$options = filter_var_array( $options, $def );
 		extract( $options );
 		
-		if ( $hyphenate_classname === false )
-			$this->cnHypenate = false;
+		if ( isset( $hyphenate_classname ) )
+			$this->cnHyphenate = $hyphenate_classname;
 		
-		if ( $hyphenate_namespace === false )
-			$this->nsHyphenate = false;
+		if ( isset( $hyphenate_namespace ) )
+			$this->nsHyphenate = $hyphenate_namespace;
 
 		if ( isset( $decamelize_classname ) )
 			$this->cnDecamelize = $decamelize_classname;
@@ -181,7 +185,7 @@ class ClassLoader {
 			$file = str_replace( $search, $replace, $subNs ) . '/';
 		}
 		$file .= $this->filePrefix;
-		$file .= $this->cnHypenate ? str_replace( '_', '-', $class ) : $class;
+		$file .= $this->cnHyphenate ? str_replace( '_', '-', $class ) : $class;
 		$file  = $this->path . $file . '.php';
 
 		if ( file_exists( $file ) )
