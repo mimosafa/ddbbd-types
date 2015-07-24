@@ -622,7 +622,21 @@ class Settings_Page {
 	}
 
 	/**
+	 *
+	 */
+	public function file( $path, $args = [] ) {
+		if ( ! self::$page || ! $path = realpath( $path ) )
+			return;
+		self::$page['callback'] = [ &$this, 'include_file' ];
+		self::$page['file_path'] = $path;
+		self::$page['include_file_args'] = $args;
+		return $this;
+	}
+
+	/**
 	 * Set submit button ---- yet !!
+	 *
+	 * @todo
 	 *
 	 * @access public
 	 *
@@ -748,6 +762,14 @@ class Settings_Page {
           <?php } ?>
         </fieldset>
 <?php
+	}
+
+	public function include_file() {
+		$menu_slug = $_GET['page'];
+		$path = self::$callback_args['page_' . $menu_slug]['file_path'];
+		if ( $args = self::$callback_args['page_' . $menu_slug]['include_file_args'] )
+			extract( $args );
+		include $path;
 	}
 
 	//

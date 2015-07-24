@@ -6,20 +6,29 @@
  * @subpackage DDBBD
  * @author     Toshimichi Mimoto
  */
+namespace DanaDonBoomBoomDoo\Types;
 
-add_action( 'plugins_loaded', 'DanaDonBoomBoomDoo_Types::getInstance' );
+/**
+ * Index in 'Dana Don-Boom-Boom-Doo' plugins
+ */
+const ORDER = 10;
+
+/**
+ * Bootstrap after plugins loaded
+ */
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\Bootstrap::getInstance' );
 
 /**
  * Bootstrap Class
  */
-class DanaDonBoomBoomDoo_Types {
+class Bootstrap {
 
 	/**
 	 * Singleton pattern
 	 *
 	 * @uses DDBBD\Singleton
 	 */
-	use DDBBD\Singleton;
+	use \DDBBD\Singleton;
 
 	/**
 	 * Constructor
@@ -27,18 +36,9 @@ class DanaDonBoomBoomDoo_Types {
 	 * @access private
 	 */
 	protected function __construct() {
-		$this->_register_classloader();
 		register_activation_hook( DDBBD_TYPES_FILE, [ &$this, '_activation' ] );
 		register_deactivation_hook( DDBBD_TYPES_FILE, [ &$this, '_deactivation' ] );
 		$this->init();
-	}
-
-	/**
-	 * @access private
-	 */
-	private function _register_classloader() {
-		$options = [ 'file_prefix' => 'class-types-' ];
-		_ddbbd_register_classloader( 'DanaDonBoomBoomDoo_Types', DDBBD_TYPES_INC, $options );
 	}
 
 	/**
@@ -60,7 +60,7 @@ class DanaDonBoomBoomDoo_Types {
 	 */
 	private function init() {
 		if ( is_admin() )
-			add_action( 'init', 'DanaDonBoomBoomDoo_Types\\Settings::getInstance' );
+			add_action( 'init', __NAMESPACE__ . '\\Settings::getInstance', ORDER );
 	}
 
 }
