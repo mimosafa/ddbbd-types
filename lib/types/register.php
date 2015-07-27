@@ -180,6 +180,17 @@ class Register {
 			 */
 			extract( $array );
 
+			if ( ! $taxonomy = filter_var( $taxonomy ) )
+				continue;
+
+			$args = is_array( $args ) ? $args : [];
+
+			if ( ! isset( $args['label'] ) || ! filter_var( $args['label'] ) ) {
+				if ( ! isset( $args['labels'] ) || ! isset( $args['labels']['name'] ) || ! filter_var( $args['labels']['name'] ) ) {
+					$args['label'] = self::labelize( $taxonomy );
+				}
+			}
+
 			/**
 			 * @todo
 			 */

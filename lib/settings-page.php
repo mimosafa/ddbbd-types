@@ -783,4 +783,10 @@ class Settings_Page {
 		return !! $this->toplevel;
 	}
 
+	public static function current_cached_page() {
+		if ( self::$page )
+			return self::$page['page'];
+		return null;
+	}
+
 }

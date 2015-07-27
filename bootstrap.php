@@ -11,24 +11,31 @@ namespace DanaDonBoomBoomDoo\Types;
 /**
  * Index in 'Dana Don-Boom-Boom-Doo' plugins
  */
-const ORDER = 10;
+const INDEX = 10;
 
 /**
  * Bootstrap after plugins loaded
  */
-add_action( 'plugins_loaded', __NAMESPACE__ . '\\Bootstrap::getInstance' );
+add_action( 'plugins_loaded', __NAMESPACE__ . '\\Bootstrap::getInstance', INDEX );
 
 /**
  * Bootstrap Class
  */
 class Bootstrap {
-
 	/**
 	 * Singleton pattern
 	 *
 	 * @uses DDBBD\Singleton
 	 */
 	use \DDBBD\Singleton;
+
+	/**
+	 * Dana Don-Boom-Boom-Doo Types plugin options
+	 */
+	private $options = [
+		'use_types' => 'boolean',
+		'types' => null,
+	];
 
 	/**
 	 * Constructor
@@ -38,6 +45,7 @@ class Bootstrap {
 	protected function __construct() {
 		register_activation_hook( DDBBD_TYPES_FILE, [ &$this, '_activation' ] );
 		register_deactivation_hook( DDBBD_TYPES_FILE, [ &$this, '_deactivation' ] );
+		$this->set_options();
 		$this->init();
 	}
 
@@ -55,12 +63,21 @@ class Bootstrap {
 		//
 	}
 
+	private function set_options() {
+		$options = _ddbbd_options();
+		foreach ( $this->options as $option => $filter ) {
+			$options->add( $option, $filter );
+		}
+	}
+
 	/**
 	 * @access private
 	 */
 	private function init() {
-		if ( is_admin() )
-			add_action( 'init', __NAMESPACE__ . '\\Settings::getInstance', ORDER );
+		if ( is_admin() ) {
+			\DDBBD\Types\Objects::getInstance();
+			Settings::getInstance();
+		}
 	}
 
 }

@@ -45,7 +45,7 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 			$e->add(
 				'error',
 				sprintf(
-					__( '<p>PHP version %1$s does not meet the requirements to use <code>%2$s</code>. %3$s or higher will be required.</p>' ),
+					__( '<p>PHP version %1$s does not meet the requirements to activate <code>%2$s</code>. %3$s or higher will be required.</p>' ),
 					esc_html( $phpEnv ), $basename, esc_html( $phpReq )
 				)
 			);
@@ -56,7 +56,7 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 			$e->add(
 				'error',
 				sprintf(
-					__( '<p>WordPress version %1$s does not meet the requirements to use <code>%2$s</code>. %3$s or higher will be required.</p>' ),
+					__( '<p>WordPress version %1$s does not meet the requirements to activate <code>%2$s</code>. %3$s or higher will be required.</p>' ),
 					esc_html( $wpEnv ), $basename, esc_html( $wpReq )
 				)
 			);
@@ -128,8 +128,22 @@ if ( ! function_exists( '_ddbbd_settings_page' ) ) {
 		static $instance;
 		if ( ! $instance ) {
 			$instance = new DDBBD\Settings_Page( 'ddbbd', '', __( 'DDBBD', 'ddbbd' ) );
-			add_action( 'wp_loaded', array( $instance, 'done' ) );
+			add_action( 'setup_theme', array( $instance, 'done' ), 9999 );
 		}
+		return $instance;
+	}
+}
+
+if ( ! function_exists( '_ddbbd_options' ) ) {
+	/**
+	 * Return 'Dana Don-Boom-Boom-Doo' plugin's option instance
+	 *
+	 * @return DDBBD\Options
+	 */
+	function _ddbbd_options() {
+		static $instance;
+		if ( ! $instance )
+			$instance = new DDBBD\Options( 'ddbbd_' );
 		return $instance;
 	}
 }

@@ -1,46 +1,75 @@
 <?php
 namespace DDBBD;
 
-trait Options {
-
-	/**
-	 * Singleton pattern
-	 *
-	 * @uses DDBBD\Singleton
-	 */
-	use Singleton;
-
-	/**
-	 * Cache group name
-	 * - If use WP_Cache API, define as '$cache_group'
-	 *
-	 * @var string
-	 */
+/**
+ * Dana Don-Boom-Boom-Doo WP Options API interface
+ */
+class Options {
 
 	/**
 	 * Prefix of option keys
-	 * - If necessary, define as '$prefix'
 	 *
 	 * @var string
 	 */
+	private $prefix;
+
+	/**
+	 * Cache group name
+	 *
+	 * @var string
+	 */
+	private $cache_group;
 
 	/**
 	 * Option keys
-	 * - You must define as '$keys'
-	 * - Regexp: /[a-zA-Z0-9_]+/
-	 * - e.g.:   private $keys = [ 'company_name', 'representative' ];
 	 *
 	 * @var array
 	 */
+	private $keys = [];
+
+	/**
+	 * Constructor
+	 *
+	 * @access public
+	 */
+	public function __construct( $prefix ) {
+		$regexp = [ 'regexp' => '/\A[a-zA-Z0-9][a-zA-Z0-9_]*_\z/' ];
+		if ( ! $prefix = filter_var( $prefix, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
+			return;
+
+		$this->prefix = $prefix;
+		$this->cache_group = $prefix . 'cache_group';
+
+		add_filter( 'pre_update_option', [ &$this, '_pre_update_option' ], 10, 3 );
+	}
+
+	/**
+	 * @access public
+	 *
+	 * @param  string $option_name
+	 * @param  string|callable $sanitize
+	 * @return void
+	 */
+	public function add( $option_name, $filter = null ) {
+		$regexp = [ 'regexp' => '/\A[a-z0-9_]+\z/' ];
+		if ( ! $option_name = filter_var( $option_name, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
+			return;
+		if ( $filter ) {
+			if ( method_exists( __CLASS__, 'option_filter_' . $filter ) )
+				$filter_cb = [ &$this, 'option_filter_' . $filter ];
+			else if ( is_callable( $filter ) )
+				$filter_cb = $filter;
+		}
+		$this->keys[$option_name] = isset( $filter_cb ) ? $filter_cb : null;
+	}
 
 	/**
 	 * Option interface
 	 *
 	 * @access public
 	 */
-	public static function __callStatic( $name, $args ) {
-		$self = self::getInstance();
-		if ( ! property_exists( $self, 'keys' ) )
+	public function __call( $name, $args ) {
+		if ( ! $this->keys )
 			return;
 
 		if ( substr( $name, 0, 4 ) === 'get_' ) :
@@ -48,20 +77,20 @@ trait Options {
 			 * @uses DDBBD\Options::get()
 			 */
 			array_unshift( $args, substr( $name, 4 ) );
-			return call_user_func_array( [ $self, 'get' ], $args );
+			return call_user_func_array( [ &$this, 'get' ], $args );
 
 		elseif ( substr( $name, 0, 7 ) === 'update_' ) :
 			/**
 			 * @uses DDBBD\Options::update()
 			 */
 			array_unshift( $args, substr( $name, 7 ) );
-			return call_user_func_array( [ $self, 'update' ], $args );
+			return call_user_func_array( [ &$this, 'update' ], $args );
 
 		elseif ( substr( $name, 0, 7 ) === 'delete_' ) :
 			/**
 			 * @uses DDBBD\Options::delete()
 			 */
-			return call_user_func_array( [ $self, 'delete' ], $args );
+			return call_user_func_array( [ &$this, 'delete' ], $args );
 
 		endif;
 	}
@@ -71,35 +100,17 @@ trait Options {
 	 *
 	 * @param  string $key
 	 */
-	public static function full_key( $key = null ) {
-		$self = self::getInstance();
-		if ( ! property_exists( $self, 'keys' ) )
+	public function full_key( $key = null ) {
+		if ( ! $this->keys )
 			return null;
 
-		if ( is_string( $key ) && in_array( $key, $self->keys, true ) )
-			return property_exists( $self, 'prefix' ) ? $self->prefix . $key : $key;
+		if ( is_string( $key ) && array_key_exists( $key, $this->keys ) )
+			return $this->prefix . $key;
 
 		if ( ! $key )
-			if ( property_exists( $self, 'prefix' ) )
-				return array_map( function( $key ) { return $this->prefix . $key; }, $self->keys );
-			else
-				return $self->keys;
+			return array_map( function( $key ) { return $this->prefix . $key; }, array_keys( $this->keys ) );
 
 		return null;
-	}
-
-	/**
-	 * Constructor
-	 *
-	 * @access protected
-	 */
-	protected function __construct() {
-		if ( ! property_exists( __CLASS__, 'keys' ) || ! is_array( $this->keys ) )
-			return;
-		if ( property_exists( __CLASS__, 'prefix' ) ) {
-			$this->keys = apply_filters( $this->prefix . '_option_keys', $this->keys );
-			add_filter( 'pre_update_option', [ &$this, '_pre_update_option' ], 10, 3 );
-		}
 	}
 
 	/**
@@ -115,19 +126,13 @@ trait Options {
 	private function get() {
 		$args = func_get_args();
 		$key = $args[0];
-		if ( ! in_array( $key, $this->keys, true ) )
+		if ( ! array_key_exists( $key, $this->keys ) )
 			return null;
 		if ( isset( $args[1] ) && filter_var( $args[1] ) )
 			$key .= '_' . $args[1];
 
-		if ( ! property_exists( __CLASS__, 'cache_group' ) ) {
-			$option = property_exists( __CLASS__, 'prefix' ) ? $this->prefix . $key : $key;
-			return get_option( $option, null );
-		}
-
 		if ( ! $value = wp_cache_get( $key, $this->cache_group ) ) {
-			$option = property_exists( __CLASS__, 'prefix' ) ? $this->prefix . $key : $key;
-			if ( $value = get_option( $option, null ) )
+			if ( $value = get_option( $this->prefix . $key, null ) )
 				wp_cache_set( $key, $value, $this->cache_group );
 		}
 		return $value;
@@ -154,17 +159,18 @@ trait Options {
 			$newvalue = $args[1];
 			$oldvalue = $this->get( $key );
 		}
+		if ( $filter = $this->keys[$key] )
+			$newvalue = call_user_func( $filter, $newvalue );
+		if ( ! isset( $newvalue ) )
+			return null;
 		if ( $oldvalue === $newvalue )
 			return false;
 
 		$key .= isset( $subkey ) ? '_' . $subkey : '';
 
-		if ( property_exists( __CLASS__, 'cache_group' ) )
-			wp_cache_delete( $key, $this->cache_group );
+		wp_cache_delete( $key, $this->cache_group );
 
-		$option = property_exists( __CLASS__, 'prefix' ) ? $this->prefix . $key : $key;
-
-		return update_option( $option, $newvalue );
+		return update_option( $this->prefix . $key, $newvalue );
 	}
 
 	/**
@@ -179,17 +185,23 @@ trait Options {
 	private function delete() {
 		$args = func_get_args();
 		$key = $args[0];
-		if ( ! in_array( $key, $this->keys, true ) )
+		if ( ! array_key_exists( $key, $this->keys ) )
 			return null;
 		if ( isset( $args[1] ) && filter_var( $args[1] ) )
 			$key .= '_' . $args[1];
 
-		if ( property_exists( __CLASS__, 'cache_group' ) )
-			wp_cache_delete( $key, $this->cache_group );
+		wp_cache_delete( $key, $this->cache_group );
 
-		$option = property_exists( __CLASS__, 'prefix' ) ? $this->prefix . $key : $key;
+		return delete_option( $this->prefix . $key );
+	}
 
-		return delete_option( $option );
+	private function option_filter_default( $var ) {
+		$var = filter_var( $var );
+		return $var ?: null;
+	}
+
+	private function option_filter_boolean( $var ) {
+		return filter_var( $var, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE );
 	}
 
 	/**
@@ -207,7 +219,7 @@ trait Options {
 
 		$key = substr( $option, strlen( $this->prefix ) );
 		$subkey = '';
-		if ( ! in_array( $key, $this->keys, true ) ) {
+		if ( ! array_key_exists( $key, $this->keys ) ) {
 			foreach ( $this->keys as $string ) {
 				if ( $string . '_' === substr( $key, 0, strlen( $string ) + 1 ) ) {
 					$key = $string;
@@ -218,7 +230,6 @@ trait Options {
 			if ( ! $subkey )
 				return $value;
 		}
-
 		return apply_filters( $this->prefix . 'options_pre_update_' . $key, $value, $old_value, $subkey );
 	}
 
