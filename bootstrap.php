@@ -74,7 +74,7 @@ class Bootstrap {
 	 * @access private
 	 */
 	private function init() {
-		if ( is_admin() ) {
+		if ( is_admin() && current_user_can( 'manage_options' ) ) {
 			\DDBBD\Types\Objects::getInstance();
 			Settings::getInstance();
 		}

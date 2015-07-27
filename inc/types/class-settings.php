@@ -44,7 +44,7 @@ class Settings {
 			return;
 
 		$page = _ddbbd_settings_page();
-		$page->init( 'ddbbd_types', __( 'Content Types' ), __( 'Types' ) );
+		$page->init( 'ddbbd_types', '', __( 'Types' ) );
 		$page->file( DDBBD_TYPES_INC . '/inc-ddbbd-types.php', $this->parse_requests() );
 	}
 
@@ -52,16 +52,9 @@ class Settings {
 		$actionFilter = function( $var ) {
 			return array_key_exists( $var, $this->actions ) ? $var : null;
 		};
-		$postTypeFilter = function( $var ) {
-			return post_type_exists( $var ) ? $var : null;
-		};
-		$taxonomyFilter = function( $var ) {
-			return taxonomy_exists( $var ) ? $var : null;
-		};
 		$def = [
-			'action'    => [ 'filter' => \FILTER_CALLBACK, 'options' => $actionFilter ],
-			'post_type' => [ 'filter' => \FILTER_CALLBACK, 'options' => $postTypeFilter ],
-			'taxonomy'  => [ 'filter' => \FILTER_CALLBACK, 'options' => $taxonomyFilter ],
+			'action' => [ 'filter' => \FILTER_CALLBACK, 'options' => $actionFilter ],
+			'type'   => \FILTER_DEFAULT,
 		];
 		return filter_input_array( \INPUT_GET, $def );
 	}

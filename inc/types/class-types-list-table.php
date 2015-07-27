@@ -45,6 +45,11 @@ class Types_List_Table extends \WP_List_Table {
 		return isset( $item['_builtin'] ) ? '' : sprintf( '<input type="checkbox" name="types[]" value="%s" />', $item['name'] );
 	}
 
+	public function column_label( $item ) {
+		$href = sprintf( '?page=ddbbd_types&type=%s', esc_html( $item['name'] ) );
+		return sprintf( '<a href="%s">%s</a>', $href, esc_html( $item['label'] ) );
+	}
+
 	public function column_default( $item, $column_name ) {
 		$return = isset( $item[$column_name] ) ? esc_html( $item[$column_name] ) : '';
 		if ( isset( $item['_builtin'] ) && $item['_builtin'] )
