@@ -21,27 +21,49 @@ class Settings {
 	private $options;
 
 	/**
+	 * Actions
+	 */
+	private $actions = [
+		'add-new' => 'Add New'
+	];
+
+	/**
 	 * @uses DanaDonBoomBoomDoo\INDEX
 	 */
 	protected function __construct() {
 		$this->options = _ddbbd_options();
-		$this->menu_page();
+		$this->add_menu_page();
 		add_action( 'setup_theme', [ &$this, 'general_settings' ], 1000 + INDEX );
 	}
 
 	/**
 	 *
 	 */
-	private function menu_page() {
+	private function add_menu_page() {
 		if ( ! $this->options->get_use_types() )
 			return;
 
 		$page = _ddbbd_settings_page();
-		$page
-			->init( 'ddbbd_types', __( 'Content Types' ), __( 'Types' ) )
-				->section( 'types-list-table' )
-				->callback( [ &$this, 'types_list_table' ] )
-		;
+		$page->init( 'ddbbd_types', __( 'Content Types' ), __( 'Types' ) );
+		$page->file( DDBBD_TYPES_INC . '/inc-ddbbd-types.php', $this->parse_requests() );
+	}
+
+	private function parse_requests() {
+		$actionFilter = function( $var ) {
+			return array_key_exists( $var, $this->actions ) ? $var : null;
+		};
+		$postTypeFilter = function( $var ) {
+			return post_type_exists( $var ) ? $var : null;
+		};
+		$taxonomyFilter = function( $var ) {
+			return taxonomy_exists( $var ) ? $var : null;
+		};
+		$def = [
+			'action'    => [ 'filter' => \FILTER_CALLBACK, 'options' => $actionFilter ],
+			'post_type' => [ 'filter' => \FILTER_CALLBACK, 'options' => $postTypeFilter ],
+			'taxonomy'  => [ 'filter' => \FILTER_CALLBACK, 'options' => $taxonomyFilter ],
+		];
+		return filter_input_array( \INPUT_GET, $def );
 	}
 
 	/**
@@ -60,12 +82,6 @@ class Settings {
 				->field( 'enable-custom-types', __( 'Enable Custom Types', 'ddbbd' ) )
 				->option_name( $this->options->full_key( 'use_types' ), 'checkbox' )
 		;
-	}
-
-	public function types_list_table() {
-		$lt = new Types_List_Table();
-		$lt->prepare_items();
-		$lt->display();
 	}
 
 }
