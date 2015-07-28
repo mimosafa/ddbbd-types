@@ -45,7 +45,7 @@ class Settings {
 
 		$page = _ddbbd_settings_page();
 		$page->init( 'ddbbd_types', '', __( 'Types' ) );
-		$page->file( DDBBD_TYPES_INC . '/inc-ddbbd-types.php', $this->parse_requests() );
+		$page->file( DDBBD_TYPES_INC . '/inc-types.php', $this->parse_requests() );
 	}
 
 	private function parse_requests() {

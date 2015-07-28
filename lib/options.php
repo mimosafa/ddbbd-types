@@ -159,10 +159,11 @@ class Options {
 			$newvalue = $args[1];
 			$oldvalue = $this->get( $key );
 		}
-		if ( $filter = $this->keys[$key] )
+		if ( $filter = $this->keys[$key] ) {
 			$newvalue = call_user_func( $filter, $newvalue );
-		if ( ! isset( $newvalue ) )
-			return null;
+			if ( ! isset( $newvalue ) )
+				return null;
+		}
 		if ( $oldvalue === $newvalue )
 			return false;
 
