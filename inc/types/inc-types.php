@@ -1,13 +1,22 @@
 <?php
 namespace DanaDonBoomBoomDoo\Types;
 
+if ( ! defined( 'DDBBD_TYPES_INC' ) )
+	die('-1');
+
+/**
+ * @var string $action
+ * @var string $type
+ */
+$r = parse_requests();
+extract( $r );
+
 $objects = \DDBBD\Types\Objects::getAll();
 
-$current_action = $action;
 $current_type = isset( $type ) && array_key_exists( $type, $objects ) ? $objects[$type] : null;
 $args = [];
 
-if ( isset( $current_action ) ) {
+if ( isset( $action ) ) {
 	//
 } else if ( isset( $current_type ) ) {
 	/**
@@ -24,6 +33,18 @@ if ( isset( $current_action ) ) {
 	if ( current_user_can( 'manage_options' ) )
 		$h2 .= sprintf( '<a href="%s" class="add-new-h2">%s</a>', '?page=ddbbd_types&action=add-new', __( 'Add New Type', 'ddbbd' ) );
 	$callback = 'render_types_list_table';
+}
+
+function parse_requests() {
+	$actionFilter = function( $var ) {
+		static $actions = [ 'add-new' ];
+		return in_array( $var, $actions, true ) ? $var : null;
+	};
+	$def = [
+		'action' => [ 'filter' => \FILTER_CALLBACK, 'options' => $actionFilter ],
+		'type'   => \FILTER_DEFAULT,
+	];
+	return filter_input_array( \INPUT_GET, $def );
 }
 
 /**

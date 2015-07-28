@@ -67,9 +67,9 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 			global $_ddbbd_deactivate_plugins;
 
 			if ( ! $_ddbbd_version_error_messages )
-				$_ddbbd_version_error_messages = $e->get_error_messages();
-			else
-				$_ddbbd_version_error_messages = $_ddbbd_version_error_messages + $e->get_error_messages();
+				$_ddbbd_version_error_messages = array();
+
+			$_ddbbd_version_error_messages = $_ddbbd_version_error_messages + $e->get_error_messages();
 
 			if ( ! $_ddbbd_deactivate_plugins )
 				$_ddbbd_deactivate_plugins = array();
@@ -128,6 +128,7 @@ if ( ! function_exists( '_ddbbd_settings_page' ) ) {
 		static $instance;
 		if ( ! $instance ) {
 			$instance = new DDBBD\Settings_Page( 'ddbbd', '', __( 'DDBBD', 'ddbbd' ) );
+			$instance->set_options( _ddbbd_options() );
 			add_action( 'setup_theme', array( $instance, 'done' ), 9999 );
 		}
 		return $instance;

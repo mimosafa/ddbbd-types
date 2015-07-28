@@ -20,12 +20,7 @@ class Settings {
 	 */
 	private $options;
 
-	/**
-	 * Actions
-	 */
-	private $actions = [
-		'add-new' => 'Add New'
-	];
+	private $actions = [ 'add-new' ];
 
 	/**
 	 * @uses DanaDonBoomBoomDoo\INDEX
@@ -45,18 +40,51 @@ class Settings {
 
 		$page = _ddbbd_settings_page();
 		$page->init( 'ddbbd_types', '', __( 'Types' ) );
-		$page->file( DDBBD_TYPES_INC . '/inc-types.php', $this->parse_requests() );
+		if ( filter_input( \INPUT_GET, 'page' ) !== 'ddbbd_types' )
+			return;
+
+		/**
+		 * Settings page, Now.
+		 */
+		$r = $this->parse_requests();
+		extract( $r );
+		if ( isset( $type ) ) {
+			//
+		} else if ( isset( $action ) ) {
+			//
+		} else {
+			$page->callback( [ &$this, 'render_types_list_table' ] );
+		}
 	}
 
+	/**
+	 *
+	 */
 	private function parse_requests() {
 		$actionFilter = function( $var ) {
-			return array_key_exists( $var, $this->actions ) ? $var : null;
+			return in_array( $var, $this->actions, true ) ? $var : null;
 		};
 		$def = [
 			'action' => [ 'filter' => \FILTER_CALLBACK, 'options' => $actionFilter ],
 			'type'   => \FILTER_DEFAULT,
 		];
-		return filter_input_array( \INPUT_GET, $def );
+		return filter_input_array( \INPUT_GET, $def, true );
+	}
+
+	/**
+	 *
+	 */
+	public function render_types_list_table() {
+		$h2 = __( 'Content Types', 'ddbbd' );
+		if ( current_user_can( 'manage_options' ) )
+			$h2 .= sprintf( '<a href="%s" class="add-new-h2">%s</a>', '?page=ddbbd_types&action=add-new', __( 'Add New Type', 'ddbbd' ) );
+		$lt = new Types_List_Table();
+		$lt->prepare_items();
+
+		echo '<div class="wrap">';
+		echo '<h2>' . $h2 . '</h2>';
+		$lt->display();
+		echo '</div>';
 	}
 
 	/**
@@ -68,13 +96,51 @@ class Settings {
 			$page->init( 'ddbbd_general_settings', __( 'Dana Don-Boom-Boom-Doo General Settings' ), __( 'Settings', 'ddbbd' ) );
 		}
 		$page
-			->section( 'custom-types-manager', __( 'Custom Types Management' ) )
-			->description( __( 'Dana Don-Boom-Boom-Doo plugin will make you enable to manage Custom Content Types easier.') )
-			->description( __( 'Every Custom Post Types, Custom Taxonomies, and Custom Endpoints will be managed as <strong>Type</strong> units.' ) )
-			->description( __( 'If you enable to use Custom Types, "Types" menu will appear.' ) )
-				->field( 'enable-custom-types', __( 'Enable Custom Types', 'ddbbd' ) )
-				->option_name( $this->options->full_key( 'use_types' ), 'checkbox' )
+			->section( 'custom-types-manager', __( 'Custom Types Management', 'ddbbd' ) )
+				->description( __( 'Dana Don-Boom-Boom-Doo plugin will make you enable to manage Custom Content Types easier.') )
+				->description( __( 'Every Custom Post Types, Custom Taxonomies, and Custom Endpoints will be managed as <strong>Type</strong> units.' ) )
+				->description( __( 'If you enable to use Custom Types, "Types" menu will appear.' ) )
+					->field( 'enable-custom-types', __( 'Enable Custom Types', 'ddbbd' ) )
+						->option_name( $this->options->full_key( 'use_types' ), 'checkbox' )
 		;
+		if ( $this->options->get_use_types() ) {
+			$page
+				->field( 'export-types-as-json', __( 'Save as json files', 'ddbbd' ) )
+					->option_name( $this->options->full_key( 'export_types_as_json' ), 'checkbox' )
+				->field( 'dir-for-save-json', __( 'Directory for saving json files', 'ddbbd' ) )
+					->option_name( $this->options->full_key( 'types_json_dir' ), [ &$this, 'save_json_dir' ] )
+			;
+		}
+	}
+
+	/**
+	 *
+	 */
+	public function save_json_dir( $args ) {
+		$key = $this->options->full_key( 'types_json_dir' );
+		$pathPrefix = substr( WP_CONTENT_DIR, strlen( ABSPATH ) - 1 ) . '/';
+		if ( ! $jsonDir = $this->options->get_types_json_dir() ) {
+			$jsonDir = WP_CONTENT_DIR . '/json';
+		}
+		$value = substr( $jsonDir, strlen( WP_CONTENT_DIR ) + 1 );
+		$class = 'regular-text';
+		$disabled = '';
+		if ( ! $this->options->get_export_types_as_json() ) {
+			$class .= ' disabled';
+			$disabled = ' disabled="disabled"';
+		}
+		//
+?>
+<label for="<?php esc_attr_e( $key ); ?>">
+	<code><?php echo $pathPrefix; ?></code>
+	<?php printf( '<input type="text" name="%1$s" id="%1$s" class="%2$s" value="%3$s"%4$s />', esc_attr( $key ), $class, esc_attr( $value ), $disabled ); ?>
+</label>
+<script>
+	(function( $ ) {]
+		//
+	} )( jQuery );
+</script>
+<?php
 	}
 
 }

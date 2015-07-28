@@ -22,6 +22,13 @@ namespace DDBBD;
 class Settings_Page {
 
 	/**
+	 * DDBBD Options instance
+	 *
+	 * @var DDBBD\Options
+	 */
+	private $options;
+
+	/**
 	 * Top level page
 	 *
 	 * @var string
@@ -74,6 +81,13 @@ class Settings_Page {
 	public function __construct( $page = null, $page_title = null, $menu_title = null ) {
 		self::$page = self::$section = self::$field = [];
 		$this->init( $page, $page_title, $menu_title );
+	}
+
+	/**
+	 *
+	 */
+	public function set_options( Options $options ) {
+		$this->options = $options;
 	}
 
 	/**
@@ -219,7 +233,7 @@ class Settings_Page {
 					remove_submenu_page( $this->toplevel, $this->toplevel );
 				} );
 			} else {
-				return;
+				$callback = [ &$this, 'empty_page' ];
 			}
 		}
 		else
@@ -689,7 +703,7 @@ class Settings_Page {
 	 * @return (void)
 	 */
 	public function page_body() {
-		$menu_slug = $_GET['page'];
+		$menu_slug = filter_input( \INPUT_GET, 'page' );
 		if ( ! $arg = self::$callback_args['page_' . $menu_slug] )
 			return;
 
@@ -724,6 +738,19 @@ class Settings_Page {
 		echo '</div>';
 	}
 
+	public function include_file() {
+		$menu_slug = filter_input( \INPUT_GET, 'page' );
+		$path = self::$callback_args['page_' . $menu_slug]['file_path'];
+		if ( $args = self::$callback_args['page_' . $menu_slug]['include_file_args'] )
+			extract( $args );
+		include $path;
+	}
+
+	public function empty_page() {
+		$menu_slug = filter_input( \INPUT_GET, 'page' );
+		do_action( 'ddbbd_settings_page_empty_page_' . $menu_slug );
+	}
+
 	/**
 	 * @param  array $array
 	 */
@@ -744,32 +771,36 @@ class Settings_Page {
 	/**
 	 *
 	 */
-	public function checkbox( $arg ) {
-		if ( ! array_key_exists( 'option_name', $arg ) )
-			return; // error
+	public function checkbox( $args ) {
+		if ( ! isset( $args['option_name'] ) )
+			return;
 
-		$option = $arg['option_name'];
+		$option = esc_attr( $args['option_name'] );
 		$checked = \get_option( $option ) ? 'checked="checked" ' : '';
-		$label = array_key_exists( 'label', $arg ) ? $arg['label'] : '';
+		$label = isset( $args['label'] ) ? $args['label'] : '';
 ?>
-        <fieldset>
-          <label for="<?= $option ?>">
-            <input type="checkbox" name="<?= $option ?>" id="<?= $option ?>" value="1" <?= $checked ?>/>
-            <?= $label ?>
-          </label>
-          <?php if ( array_key_exists( 'description', $arg ) ) { ?>
-          <?= $arg['description'] ?>
-          <?php } ?>
-        </fieldset>
+<label for="<?php echo $option; ?>">
+	<input type="checkbox" name="<?php echo $option; ?>" id="<?php echo $option; ?>" value="1" <?php echo $checked ?>/>
+	<?php echo $label; ?>
+</label>
 <?php
+		if ( isset( $args['description'] ) )
+			echo $args['description'];
 	}
 
-	public function include_file() {
-		$menu_slug = $_GET['page'];
-		$path = self::$callback_args['page_' . $menu_slug]['file_path'];
-		if ( $args = self::$callback_args['page_' . $menu_slug]['include_file_args'] )
-			extract( $args );
-		include $path;
+	/**
+	 *
+	 */
+	public function text( $args ) {
+		if ( ! isset( $args['option_name'] ) )
+			return;
+
+		$option = esc_attr( $args['option_name'] );
+?>
+<input type="text" name="<?php echo $option; ?>" id="<?php echo $option; ?>" value="" class="regular-text" />
+<?php
+		if ( isset( $args['description'] ) )
+			echo $args['description'];
 	}
 
 	//

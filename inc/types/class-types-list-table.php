@@ -16,6 +16,11 @@ class Types_List_Table extends \WP_List_Table {
 		] );
 	}
 
+	public function __get( $name ) {
+		if ( property_exists( __CLASS__, $name ) )
+			return $this->$name;
+	}
+
 	public function prepare_items() {
 		$this->_column_headers = [
 			$this->get_columns(),
@@ -33,8 +38,9 @@ class Types_List_Table extends \WP_List_Table {
 	public function get_columns() {
 		$columns = [
 			'cb'     => '<input type="checkbox" />',
-			'label' => __( 'Label' ),
+			'label'  => __( 'Label' ),
 			'type'   => __( 'Content Type', 'ddbbd' ),
+			'item_of' => __( 'Item of', 'ddbbd' ),
 		];
 		return $columns;
 	}
@@ -50,11 +56,14 @@ class Types_List_Table extends \WP_List_Table {
 		return sprintf( '<a href="%s">%s</a>', $href, esc_html( $item['label'] ) );
 	}
 
-	public function column_default( $item, $column_name ) {
-		$return = isset( $item[$column_name] ) ? esc_html( $item[$column_name] ) : '';
+	public function column_item_of( $item ) {
 		if ( isset( $item['_builtin'] ) && $item['_builtin'] )
-			$return .= ' <small>core</small>';
-		return $return;
+			return __( 'WordPress Core', 'ddbbd' );
+		return '';
+	}
+
+	public function column_default( $item, $column_name ) {
+		return isset( $item[$column_name] ) ? esc_html( $item[$column_name] ) : '';
 	}
 
 }

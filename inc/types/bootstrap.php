@@ -30,11 +30,19 @@ class Bootstrap {
 	use \DDBBD\Singleton;
 
 	/**
+	 * @var DDBBD\Options
+	 */
+	private $optionsInstance;
+
+	/**
 	 * Dana Don-Boom-Boom-Doo Types plugin options
 	 */
 	private $options = [
 		'use_types' => 'boolean',
+		'export_types_as_json' => 'boolean',
+		'types_json_dir' => null,
 		'types' => null,
+		'type'  => null,
 	];
 
 	/**
@@ -43,9 +51,12 @@ class Bootstrap {
 	 * @access private
 	 */
 	protected function __construct() {
+		$this->optionsInstance = _ddbbd_options();
+		foreach ( $this->options as $option => $filter ) {
+			$this->optionsInstance->add( $option, $filter );
+		}
 		register_activation_hook( DDBBD_TYPES_FILE, [ &$this, '_activation' ] );
 		register_deactivation_hook( DDBBD_TYPES_FILE, [ &$this, '_deactivation' ] );
-		$this->set_options();
 		$this->init();
 	}
 
@@ -63,13 +74,6 @@ class Bootstrap {
 		//
 	}
 
-	private function set_options() {
-		$options = _ddbbd_options();
-		foreach ( $this->options as $option => $filter ) {
-			$options->add( $option, $filter );
-		}
-	}
-
 	/**
 	 * @access private
 	 */
@@ -78,6 +82,7 @@ class Bootstrap {
 			\DDBBD\Types\Objects::getInstance();
 			Settings::getInstance();
 		}
+		\DDBBD\Types\Representation::getInstance();
 	}
 
 }
