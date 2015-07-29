@@ -5,8 +5,16 @@ use DDBBD as D;
 
 class Types_List_Table extends \WP_List_Table {
 
+	/**
+	 * @var DDBBD\Options
+	 */
 	private $options;
 
+	/**
+	 * Constructor
+	 *
+	 * @access public
+	 */
 	public function __construct() {
 		$this->options = _ddbbd_options();
 

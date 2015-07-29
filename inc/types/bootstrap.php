@@ -32,18 +32,7 @@ class Bootstrap {
 	/**
 	 * @var DDBBD\Options
 	 */
-	private $optionsInstance;
-
-	/**
-	 * Dana Don-Boom-Boom-Doo Types plugin options
-	 */
-	private $options = [
-		'use_types' => 'boolean',
-		'export_types_as_json' => 'boolean',
-		'types_json_dir' => null,
-		'types' => null,
-		'type'  => null,
-	];
+	private $options;
 
 	/**
 	 * Constructor
@@ -51,13 +40,39 @@ class Bootstrap {
 	 * @access private
 	 */
 	protected function __construct() {
-		$this->optionsInstance = _ddbbd_options();
-		foreach ( $this->options as $option => $filter ) {
-			$this->optionsInstance->add( $option, $filter );
-		}
+		$this->add_options();
 		register_activation_hook( DDBBD_TYPES_FILE, [ &$this, '_activation' ] );
 		register_deactivation_hook( DDBBD_TYPES_FILE, [ &$this, '_deactivation' ] );
 		$this->init();
+	}
+
+	private function add_options() {
+		$this->options = _ddbbd_options();
+
+		/**
+		 *
+		 */
+		$this->options->add( 'use_types', 'boolean' );
+
+		/**
+		 *
+		 */
+		$this->options->add( 'save_types_as_json', 'boolean' );
+
+		/**
+		 *
+		 */
+		$this->options->add( 'types_json_dir', null );
+
+		/**
+		 *
+		 */
+		$this->options->add( 'types', null );
+
+		/**
+		 *
+		 */
+		$this->options->add( 'type', null );
 	}
 
 	/**

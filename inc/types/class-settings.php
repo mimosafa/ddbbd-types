@@ -49,7 +49,8 @@ class Settings {
 		$r = $this->parse_requests();
 		extract( $r );
 		if ( isset( $type ) ) {
-			//
+			$page->title( $type );
+			$page->file( __DIR__ . '/inc-types.php', $r, true );
 		} else if ( isset( $action ) ) {
 			//
 		} else {
@@ -106,7 +107,7 @@ class Settings {
 		if ( $this->options->get_use_types() ) {
 			$page
 				->field( 'export-types-as-json', __( 'Save as json files', 'ddbbd' ) )
-					->option_name( $this->options->full_key( 'export_types_as_json' ), 'checkbox' )
+					->option_name( $this->options->full_key( 'save_types_as_json' ), 'checkbox' )
 				->field( 'dir-for-save-json', __( 'Directory for saving json files', 'ddbbd' ) )
 					->option_name( $this->options->full_key( 'types_json_dir' ), [ &$this, 'save_json_dir' ] )
 			;
@@ -132,11 +133,13 @@ class Settings {
 		//
 ?>
 <label for="<?php esc_attr_e( $key ); ?>">
-	<code><?php echo $pathPrefix; ?></code>
+	<code>
+		<?php echo $pathPrefix; ?>
+	</code>
 	<?php printf( '<input type="text" name="%1$s" id="%1$s" class="%2$s" value="%3$s"%4$s />', esc_attr( $key ), $class, esc_attr( $value ), $disabled ); ?>
 </label>
 <script>
-	(function( $ ) {]
+	(function( $ ) {
 		//
 	} )( jQuery );
 </script>

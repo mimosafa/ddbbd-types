@@ -638,12 +638,13 @@ class Settings_Page {
 	/**
 	 *
 	 */
-	public function file( $path, $args = [] ) {
+	public function file( $path, $args = [], $wrap = false ) {
 		if ( ! self::$page || ! $path = realpath( $path ) )
 			return;
 		self::$page['callback'] = [ &$this, 'include_file' ];
 		self::$page['file_path'] = $path;
 		self::$page['include_file_args'] = $args;
+		self::$page['wrap_included_file'] = filter_var( $wrap, \FILTER_VALIDATE_BOOLEAN );
 		return $this;
 	}
 
@@ -738,12 +739,21 @@ class Settings_Page {
 		echo '</div>';
 	}
 
+	/**
+	 *
+	 */
 	public function include_file() {
 		$menu_slug = filter_input( \INPUT_GET, 'page' );
-		$path = self::$callback_args['page_' . $menu_slug]['file_path'];
+		$args = self::$callback_args['page_' . $menu_slug];
+		$path = $args['file_path'];
+		$wrap = $args['wrap_included_file'];
+		$title = $wrap && isset( $args['title'] ) ? $args['title'] : '';
 		if ( $args = self::$callback_args['page_' . $menu_slug]['include_file_args'] )
 			extract( $args );
+		echo $wrap ? '<div class="wrap">' : '';
+		echo $title ? '<h2>' . $title . '</h2>' : '';
 		include $path;
+		echo $wrap ? '</div>' : '';
 	}
 
 	public function empty_page() {
