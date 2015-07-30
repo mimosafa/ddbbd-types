@@ -49,10 +49,16 @@ class Settings {
 		$r = $this->parse_requests();
 		extract( $r );
 		if ( isset( $type ) ) {
-			$page->title( $type );
-			$page->file( __DIR__ . '/inc-types.php', $r, true );
-		} else if ( isset( $action ) ) {
-			//
+			$page
+				->title( $type )
+				->file( __DIR__ . '/inc-types.php', $r, true )
+			;
+		} else if ( isset( $action ) && $action === 'add-new' ) {
+			$r['add_new'] = true;
+			$page
+				->title( __( 'Add Custom Type', 'ddbbd' ) )
+				->file( DDBBD_TYPES_INC . '/inc-type.php', $r, true )
+			;
 		} else {
 			$page->callback( [ &$this, 'render_types_list_table' ] );
 		}

@@ -24,25 +24,29 @@ class Types_List_Table extends \WP_List_Table {
 		] );
 	}
 
-	public function __get( $name ) {
-		if ( property_exists( __CLASS__, $name ) )
-			return $this->$name;
+	/**
+	 * Prepare List Items
+	 */
+	public function prepare_items() {
+		$this->_set_columns();
+
+		$custom_types = $this->options->get_types();
+		#if ( ! $custom_types ) {
+			$_REQUEST['view'] = 'all';
+			$this->items = array_filter( D\Types\Objects::getAll(), function( $array ) { return isset( $array['type'] ); } );
+		#}
 	}
 
-	public function prepare_items() {
+	/**
+	 * Column headers
+	 */
+	private function _set_columns() {
 		$this->_column_headers = [
 			$this->get_columns(),
 			$this->get_hidden_columns(),
 			$this->get_sortable_columns()
 		];
-
-		$custom_types = $this->options->get_types();
-		if ( ! $custom_types ) {
-			$_REQUEST['view'] = 'all';
-			$this->items = array_filter( D\Types\Objects::getAll(), function( $array ) { return isset( $array['type'] ); } );
-		}
 	}
-
 	public function get_columns() {
 		$columns = [
 			'cb'     => '<input type="checkbox" />',
@@ -55,6 +59,9 @@ class Types_List_Table extends \WP_List_Table {
 	public function get_hidden_columns() { return []; }
 	public function get_sortable_columns() { return []; }
 
+	/**
+	 * Column callbacks
+	 */
 	public function column_cb( $item ) {
 		return isset( $item['_builtin'] ) ? '' : sprintf( '<input type="checkbox" name="types[]" value="%s" />', $item['name'] );
 	}

@@ -112,7 +112,7 @@ if ( ! function_exists( '_ddbbd_register_classloader' ) ) {
 	 */
 	function _ddbbd_register_classloader( $namespace, $path, $options = null ) {
 		$options = is_array( $options ) ? $options : array();
-		$options = array_merge( $options, [ 'hyphenate_classname' => true ] );
+		$options = array_merge( $options, array( 'hyphenate_classname' => true ) );
 		if ( class_exists( 'DDBBD\\ClassLoader' ) )
 			DDBBD\ClassLoader::register( $namespace, $path, $options );
 	}
