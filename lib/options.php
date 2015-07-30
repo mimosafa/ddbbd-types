@@ -128,13 +128,16 @@ class Options {
 		$key = $args[0];
 		if ( ! array_key_exists( $key, $this->keys ) )
 			return null;
-		if ( isset( $args[1] ) && filter_var( $args[1] ) )
-			$key .= '_' . $args[1];
+
+		$subkey =  isset( $args[1] ) && filter_var( $args[1] ) ? $args[1] : null;
+		$key .= $subkey ? '_' . $subkey : '';
 
 		if ( ! $value = wp_cache_get( $key, $this->cache_group ) ) {
 			if ( $value = get_option( $this->prefix . $key, null ) )
 				wp_cache_set( $key, $value, $this->cache_group );
 		}
+		// for Test
+		$value = apply_filters( $this->prefix . 'options_get_' . $args[0], $value, $subkey );
 		return $value;
 	}
 

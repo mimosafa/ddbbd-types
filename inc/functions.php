@@ -127,7 +127,7 @@ if ( ! function_exists( '_ddbbd_settings_page' ) ) {
 	function _ddbbd_settings_page() {
 		static $instance;
 		if ( ! $instance ) {
-			$instance = new DDBBD\Settings_Page( 'ddbbd', '', __( 'DDBBD', 'ddbbd' ) );
+			$instance = new DDBBD\Settings_Page( 'ddbbd', '', __( 'Dana Don-Boom-Boom-Doo', 'ddbbd' ) );
 			$instance->set_options( _ddbbd_options() );
 			add_action( 'setup_theme', array( $instance, 'done' ), 9999 );
 		}

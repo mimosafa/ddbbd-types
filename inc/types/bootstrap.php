@@ -62,17 +62,17 @@ class Bootstrap {
 		/**
 		 *
 		 */
-		$this->options->add( 'types_json_dir', null );
+		$this->options->add( 'types_json_dir' );
 
 		/**
 		 *
 		 */
-		$this->options->add( 'types', null );
+		$this->options->add( 'types' );
 
 		/**
 		 *
 		 */
-		$this->options->add( 'type', null );
+		$this->options->add( 'type' );
 	}
 
 	/**
@@ -101,3 +101,18 @@ class Bootstrap {
 	}
 
 }
+
+/**
+ * Test
+ */
+add_filter( 'ddbbd_options_get_types', function( $value ) {
+	return [ 'ddbbd_types' ];
+} );
+
+add_filter( 'ddbbd_options_get_type', function( $value, $subkey ) {
+	return [
+		'post_type' => $subkey,
+		'args' => [ 'public' => true ],
+		'options' => [ 'permalink' => 'numeric' ]
+	];
+}, 10, 2 );
