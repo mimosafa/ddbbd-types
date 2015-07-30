@@ -9,7 +9,7 @@ namespace DDBBD\Types;
  * @package    WordPress
  * @subpackage DDBBD
  *
- * @author mimosafa <mimosafa@gmail.com>
+ * @author Toshimichi Mimoto <mimosafa@gmail.com>
  */
 class Register {
 
@@ -50,8 +50,14 @@ class Register {
 		// Stored, for registration
 		$self->post_types[] = [ 'post_type' => $name, 'args' => $args ];
 
-		// Do somthing, if necessary
-		do_action( 'ddbbd_types_register_post_type_options', $options, $name, $args );
+		if ( is_array( $options ) && $options ) {
+			// Numeric Permalink
+			if ( isset( $options['permalink'] ) && $options['permalink'] === 'numeric' )
+				Numeric_Permalink::set( $name );
+
+			// Do somthing, if necessary
+			do_action( 'ddbbd_types_register_post_type_options', $options, $name, $args );
+		}
 	}
 
 	/**
@@ -77,8 +83,10 @@ class Register {
 		// Stored, for registration
 		$self->taxonomies[] = [ 'taxonomy' => $name, 'object_type' => $object_type, 'args' => $args ];
 
-		// Do somthing, if necessary
-		do_action( 'ddbbd_types_register_taxonomy_options', $options, $name, $object_type, $args );
+		if ( is_array( $options ) && $options ) {
+			// Do somthing, if necessary
+			do_action( 'ddbbd_types_register_taxonomy_options', $options, $name, $object_type, $args );
+		}
 	}
 
 	/**
@@ -102,8 +110,10 @@ class Register {
 		// Stored, for registration
 		$self->endpoints[] = [ 'endpoint' => $name, 'args' => $args ];
 
-		// Do somthing, if necessary
-		do_action( 'ddbbd_types_register_endpoint_options', $options, $name, $args );
+		if ( is_array( $options ) && $options ) {
+			// Do somthing, if necessary
+			do_action( 'ddbbd_types_register_endpoint_options', $options, $name, $args );
+		}
 	}
 
 	/**

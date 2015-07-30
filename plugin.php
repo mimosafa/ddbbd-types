@@ -27,7 +27,7 @@
  */
 
 define( 'DDBBD_TYPES_FILE', __FILE__ );
-define( 'DDBBD_TYPES_DIR',  dirname( DDBBD_TYPES_FILE ) );
+define( 'DDBBD_TYPES_DIR', dirname( DDBBD_TYPES_FILE ) );
 define( 'DDBBD_TYPES_INC', DDBBD_TYPES_DIR . '/inc/types' );
 
 if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
@@ -36,12 +36,10 @@ if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
 if ( ! _ddbbd_plugin_requirements( __FILE__ ) )
 	return;
 
-if ( ! class_exists( 'DDBBD\\ClassLoader' ) ) {
+if ( ! class_exists( 'DDBBD\\ClassLoader' ) )
 	require_once 'lib/classloader.php';
-	_ddbbd_register_classloader( 'DDBBD', DDBBD_TYPES_DIR . '/lib' );
-}
 
-_ddbbd_register_classloader( 'DDBBD\\Types', DDBBD_TYPES_DIR . '/lib/types' );
+_ddbbd_register_classloader( 'DDBBD', DDBBD_TYPES_DIR . '/lib' );
 _ddbbd_register_classloader( 'DanaDonBoomBoomDoo\\Types', DDBBD_TYPES_INC, [ 'file_prefix' => 'class-' ] );
 
 require_once DDBBD_TYPES_INC . '/bootstrap.php';

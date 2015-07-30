@@ -97,7 +97,8 @@ class Bootstrap {
 			\DDBBD\Types\Objects::getInstance();
 			Settings::getInstance();
 		}
-		\DDBBD\Types\Representation::getInstance();
+		if ( $this->options->get_use_types() )
+			Manager::getInstance();
 	}
 
 }
