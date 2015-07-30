@@ -23,7 +23,7 @@ class Settings {
 	private $actions = [ 'add-new' ];
 
 	/**
-	 * @uses DanaDonBoomBoomDoo\INDEX
+	 * @uses DanaDonBoomBoomDoo\Types\INDEX
 	 */
 	protected function __construct() {
 		$this->options = _ddbbd_options();
@@ -104,6 +104,8 @@ class Settings {
 					->field( 'enable-custom-types', __( 'Enable Custom Types', 'ddbbd' ) )
 						->option_name( $this->options->full_key( 'use_types' ), 'checkbox' )
 		;
+		do_action( '_ddbbd_types_settings_general_settings', $page, $this->options->get_use_types() );
+		/*
 		if ( $this->options->get_use_types() ) {
 			$page
 				->field( 'export-types-as-json', __( 'Save as json files', 'ddbbd' ) )
@@ -112,6 +114,7 @@ class Settings {
 					->option_name( $this->options->full_key( 'types_json_dir' ), [ &$this, 'save_json_dir' ] )
 			;
 		}
+		*/
 	}
 
 	/**

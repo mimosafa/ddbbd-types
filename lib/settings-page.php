@@ -684,21 +684,6 @@ class Settings_Page {
 	}
 
 	/**
-	 * Return current cache - not used
-	 *
-	 * @return string|null
-	 */
-	private function current_cache() {
-		if ( self::$field )
-			return 'field';
-		else if ( self::$section )
-			return 'section';
-		else if ( self::$page )
-			return 'page';
-		return null;
-	}
-
-	/**
 	 * Drow default page html (if has form)
 	 * 
 	 * @return (void)

@@ -22,6 +22,7 @@ add_action( 'plugins_loaded', __NAMESPACE__ . '\\Bootstrap::getInstance', INDEX 
  * Bootstrap Class
  */
 class Bootstrap {
+
 	/**
 	 * Singleton pattern
 	 *
@@ -53,16 +54,6 @@ class Bootstrap {
 		 *
 		 */
 		$this->options->add( 'use_types', 'boolean' );
-
-		/**
-		 *
-		 */
-		$this->options->add( 'save_types_as_json', 'boolean' );
-
-		/**
-		 *
-		 */
-		$this->options->add( 'types_json_dir' );
 
 		/**
 		 *
