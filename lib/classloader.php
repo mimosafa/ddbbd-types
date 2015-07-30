@@ -30,7 +30,8 @@ class ClassLoader {
 	 *
 	 * @var boolean
 	 */
-	private $cnHypenate = true;
+	private $cnHyphenate = false;
+
 	/**
 	 * - Hyphenate Namespace
 	 * - e.g.
@@ -39,7 +40,8 @@ class ClassLoader {
 	 *
 	 * @var boolean
 	 */
-	private $nsHyphenate = true;
+	private $nsHyphenate = false;
+
 	/**
 	 * - Decamelize Classname
 	 * - e.g.
@@ -51,6 +53,7 @@ class ClassLoader {
 	 * @var boolean
 	 */
 	private $cnDecamelize = false;
+
 	/**
 	 * - Decamelize Namespace
 	 * - e.g.
@@ -62,6 +65,7 @@ class ClassLoader {
 	 * @var boolean
 	 */
 	private $nsDecamelize = false;
+
 	/**
 	 * - Add prefix to filename
 	 * - e.g.
@@ -114,33 +118,39 @@ class ClassLoader {
 	 * @param  array $options {
 	 *     @type boolean $hyphenate_classname
 	 *     @type boolean $hyphenate_namespace
+	 *     @type boolean $decamelize_classname
+	 *     @type boolean $decamelize_namespace
 	 * }
 	 */
 	private function _set_options( Array $options ) {
 		static $def;
 		if ( ! $def ) {
-			$isBool = [ 'filter' => \FILTER_VALIDATE_BOOLEAN, 'flags' => \FILTER_NULL_ON_FAILURE ];
+			$boolFilter = [ 'filter' => \FILTER_VALIDATE_BOOLEAN, 'flags' => \FILTER_NULL_ON_FAILURE ];
 			$def = [
-				'hyphenate_classname'  => $isBool,
-				'hyphenate_namespace'  => $isBool,
-				'decamelize_classname' => $isBool,
-				'decamelize_namespace' => $isBool,
+				'hyphenate_classname'  => $boolFilter,
+				'hyphenate_namespace'  => $boolFilter,
+				'decamelize_classname' => $boolFilter,
+				'decamelize_namespace' => $boolFilter,
+				'file_prefix' => [ 'filter' => \FILTER_VALIDATE_REGEXP, 'options' => [ 'regexp' => '/\A[a-z][a-z0-9_\-]*\z/' ] ],
 			];
 		}
 		$options = filter_var_array( $options, $def );
 		extract( $options );
 		
-		if ( $hyphenate_classname === false )
-			$this->cnHypenate = false;
+		if ( isset( $hyphenate_classname ) )
+			$this->cnHyphenate = $hyphenate_classname;
 		
-		if ( $hyphenate_namespace === false )
-			$this->nsHyphenate = false;
+		if ( isset( $hyphenate_namespace ) )
+			$this->nsHyphenate = $hyphenate_namespace;
 
 		if ( isset( $decamelize_classname ) )
 			$this->cnDecamelize = $decamelize_classname;
 
 		if ( isset( $decamelize_namespace ) )
 			$this->nsDecamelize = $decamelize_namespace;
+
+		if ( isset( $file_prefix ) )
+			$this->filePrefix = $file_prefix;
 	}
 
 	/**
@@ -174,10 +184,9 @@ class ClassLoader {
 
 			$file = str_replace( $search, $replace, $subNs ) . '/';
 		}
-		
-		$file .= $this->cnHypenate ? str_replace( '_', '-', $class ) : $class;
-		$file .= '.php';
-		$file  = $this->path . $file;
+		$file .= $this->filePrefix;
+		$file .= $this->cnHyphenate ? str_replace( '_', '-', $class ) : $class;
+		$file  = $this->path . $file . '.php';
 
 		if ( file_exists( $file ) )
 			require_once $file;

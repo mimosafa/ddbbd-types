@@ -9,10 +9,15 @@ namespace DDBBD\Types;
  * @package    WordPress
  * @subpackage DDBBD
  *
- * @author mimosafa <mimosafa@gmail.com>
+ * @author Toshimichi Mimoto <mimosafa@gmail.com>
  */
 class Register {
 
+	/**
+	 * Singleton pattern
+	 *
+	 * @uses DDBD\Singleton
+	 */
 	use \DDBBD\Singleton;
 
 	/**
@@ -45,8 +50,14 @@ class Register {
 		// Stored, for registration
 		$self->post_types[] = [ 'post_type' => $name, 'args' => $args ];
 
-		// Do somthing, if necessary
-		do_action( 'ddbbd_types_register_post_type_options', $options, $name, $args );
+		if ( is_array( $options ) && $options ) {
+			// Numeric Permalink
+			if ( isset( $options['permalink'] ) && $options['permalink'] === 'numeric' )
+				Numeric_Permalink::set( $name );
+
+			// Do somthing, if necessary
+			do_action( 'ddbbd_types_register_post_type_options', $options, $name, $args );
+		}
 	}
 
 	/**
@@ -72,8 +83,10 @@ class Register {
 		// Stored, for registration
 		$self->taxonomies[] = [ 'taxonomy' => $name, 'object_type' => $object_type, 'args' => $args ];
 
-		// Do somthing, if necessary
-		do_action( 'ddbbd_types_register_taxonomy_options', $options, $name, $object_type, $args );
+		if ( is_array( $options ) && $options ) {
+			// Do somthing, if necessary
+			do_action( 'ddbbd_types_register_taxonomy_options', $options, $name, $object_type, $args );
+		}
 	}
 
 	/**
@@ -97,8 +110,10 @@ class Register {
 		// Stored, for registration
 		$self->endpoints[] = [ 'endpoint' => $name, 'args' => $args ];
 
-		// Do somthing, if necessary
-		do_action( 'ddbbd_types_register_endpoint_options', $options, $name, $args );
+		if ( is_array( $options ) && $options ) {
+			// Do somthing, if necessary
+			do_action( 'ddbbd_types_register_endpoint_options', $options, $name, $args );
+		}
 	}
 
 	/**
@@ -106,7 +121,7 @@ class Register {
 	 *
 	 * @access private
 	 */
-	protected function __construct() {
+	private function __construct() {
 		add_action( 'init', [ &$this, 'register_taxonomies' ],   1 );
 		add_action( 'init', [ &$this, 'register_post_types' ],   1 );
 		add_action( 'init', [ &$this, 'add_rewrite_endpoints' ], 1 );
@@ -144,7 +159,7 @@ class Register {
 			if ( $this->taxonomies ) {
 				$taxonomies = isset( $args['taxonomies'] ) ? (array) $args['taxonomies'] : [];
 				foreach ( $this->taxonomies as $tax ) {
-					if ( in_array( $post_type, (array) $tax['post_types'], true ) )
+					if ( in_array( $post_type, (array) $tax['object_type'], true ) )
 						$taxonomies[] = $tax['taxonomy'];
 				}
 				if ( $taxonomies )
@@ -166,7 +181,32 @@ class Register {
 	public function register_taxonomies() {
 		if ( ! $this->taxonomies )
 			return;
-		// ~
+		
+		foreach ( $this->taxonomies as $array ) {
+			/**
+			 * @var string       $taxonomy
+			 * @var string|array $object_type
+			 * @var array        $args
+			 */
+			extract( $array );
+
+			if ( ! $taxonomy = filter_var( $taxonomy ) )
+				continue;
+
+			$args = is_array( $args ) ? $args : [];
+
+			if ( ! isset( $args['label'] ) || ! filter_var( $args['label'] ) ) {
+				if ( ! isset( $args['labels'] ) || ! isset( $args['labels']['name'] ) || ! filter_var( $args['labels']['name'] ) ) {
+					$args['label'] = self::labelize( $taxonomy );
+				}
+			}
+
+			/**
+			 * @todo
+			 */
+
+			register_taxonomy( $taxonomy, $object_type, $args );
+		}
 	}
 
 	/**
