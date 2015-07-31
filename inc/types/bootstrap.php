@@ -89,7 +89,7 @@ class Bootstrap {
 			Settings::getInstance();
 		}
 		if ( $this->options->get_use_types() )
-			Manager::getInstance();
+			add_action( 'setup_theme', __NAMESPACE__ . '\\Manager::getInstance' );
 	}
 
 }
