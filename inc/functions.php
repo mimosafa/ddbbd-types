@@ -129,7 +129,11 @@ if ( ! function_exists( '_ddbbd_settings_page' ) ) {
 		if ( ! $instance ) {
 			$instance = new DDBBD\Settings_Page( 'ddbbd', '', __( 'Dana Don-Boom-Boom-Doo', 'ddbbd' ) );
 			$instance->set_options( _ddbbd_options() );
-			add_action( 'setup_theme', array( $instance, 'done' ), 9999 );
+			/**
+			 * Q: Why 'load_textdomain' ?
+			 * A: It's called between 'setup_theme' to 'after_setup_theme'.
+			 */
+			add_action( 'load_textdomain', array( $instance, 'done' ) );
 		}
 		return $instance;
 	}
@@ -146,5 +150,18 @@ if ( ! function_exists( '_ddbbd_options' ) ) {
 		if ( ! $instance )
 			$instance = new DDBBD\Options( 'ddbbd_' );
 		return $instance;
+	}
+}
+
+if ( ! function_exists( '_ddbbd_nonce' ) ) {
+	/**
+	 * Return 'Dana Don-Boom-Boom-Doo' plugin's nonce instance
+	 *
+	 * @return DDBBD\Nonce
+	 */
+	function _ddbbd_nonce( $context ) {
+		if ( ! $context = filter_var( $context ) )
+			return null;
+		return DDBBD\Nonce::getInstance( $context );
 	}
 }

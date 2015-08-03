@@ -122,8 +122,8 @@ class Register {
 	 * @access private
 	 */
 	private function __construct() {
-		add_action( 'init', [ &$this, 'register_taxonomies' ],   1 );
-		add_action( 'init', [ &$this, 'register_post_types' ],   1 );
+		add_action( 'init', [ &$this, 'register_taxonomies' ], 1 );
+		add_action( 'init', [ &$this, 'register_post_types' ], 1 );
 		add_action( 'init', [ &$this, 'add_rewrite_endpoints' ], 1 );
 		add_filter( 'query_vars', [ &$this, 'add_query_vars'] );
 	}

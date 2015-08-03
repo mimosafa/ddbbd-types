@@ -3,15 +3,13 @@ namespace DDBBD\Types;
 
 abstract class Type {
 
-	public function __construct( $name ) {
-		if ( ! did_action( 'setup_theme' ) )
-			return false;
-		//
-	}
+	protected static $black_list;
 
-	public static function is_reserved_string( $str ) {
-		global $wp;
-		//
+	protected function __construct() {
+		if ( ! self::$black_list ) {
+			global $wp;
+			self::$black_list = $wp->public_query_vars + $wp->private_query_vars;
+		}
 	}
 
 }

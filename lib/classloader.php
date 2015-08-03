@@ -14,6 +14,7 @@ class ClassLoader {
 	 */
 	private $namespace;
 	private $path;
+	private $options;
 
 	/**
 	 * Namespace separater
@@ -87,10 +88,10 @@ class ClassLoader {
 	 * @param  string $path
 	 * @param  null|array $options Optional
 	 */
-	public static function register( $namespace, $path, $options = null ) {
+	public static function register( $namespace, $path, $options = null, $prepend = false ) {
 		$self = new self( $namespace, $path, $options );
 		if ( $self->path )
-			$self->_autoload_register();
+			$self->_autoload_register( $prepend );
 	}
 
 	/**
@@ -135,6 +136,7 @@ class ClassLoader {
 			];
 		}
 		$options = filter_var_array( $options, $def );
+		$this->options = $options;
 		extract( $options );
 		
 		if ( isset( $hyphenate_classname ) )

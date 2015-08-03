@@ -25,11 +25,11 @@ class Manager {
 	protected function __construct() {
 		$this->options = _ddbbd_options();
 		if ( $this->types = $this->options->get_types() )
-			$this->init();
+			add_action( 'setup_theme', [ &$this, 'init' ] );
 	}
 
-	private function init() {
-		if ( ! is_array( $this->types ) )
+	public function init() {
+		if ( ! doing_action( 'setup_theme' ) || ! is_array( $this->types ) )
 			return;
 
 		foreach ( $this->types as $type ) {
@@ -43,8 +43,8 @@ class Manager {
 	 *
 	 * @uses   DDBBD\Types\Register
 	 */
-	private function represent( Array $args ) {
-		extract( $args );
+	private function represent( Array $type_args ) {
+		extract( $type_args );
 		if ( isset( $post_type ) )
 			Types\Register::post_type( $post_type, $args, $options );
 		else if ( isset( $taxonomy ) )

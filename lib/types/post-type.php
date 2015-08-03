@@ -3,32 +3,26 @@ namespace DDBBD\Types;
 
 class Post_Type extends Type {
 
-	/**
-	 * @var string
-	 */
-	private $name;
-	private $quey_var;
-	private $rewrite;
-	private $label;
+	use \DDBBD\Singleton;
 
-	/**
-	 * Constructor
-	 *
-	 * @access public
-	 */
-	public function __construct( $name ) {
-		if ( ! parent::__construct( $name ) )
-			return;
-		//
+	protected function __construct() {
+		parent::__construct();
+		$this->init();
 	}
 
-	public static function is_valid_name( $name ) {
-		static $regexp = [ 'regexp' => '/\A[a-z][a-z0-9_\-]*[a-z0-9]\z/'];
-		if ( ! filter_var( $name, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
-			return false;
+	private function init() {
+		add_filter( 'ddbbd_types_register_post_type_name', [ &$this, 'filter_name' ], 10, 3 );
+	}
+
+	public function filter_name( $name, $args, $options ) {
+		static $regexp = [ 'regexp' => '/\A[a-z][a-z0-9_\-]*[a-z0-9]\z/' ];
+		if ( ! $name = filter_var( $name, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
+			return null;
 		if ( strlen( $name ) > 20 )
-			return false;
-		return true;
+			return null;
+		if ( in_array( $name, self::$black_list, true ) )
+			return null;
+		return $name;
 	}
 
 }

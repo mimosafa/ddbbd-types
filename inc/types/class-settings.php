@@ -51,7 +51,7 @@ class Settings {
 		if ( isset( $type ) ) {
 			$page
 				->title( $type )
-				->file( __DIR__ . '/inc-types.php', $r, true )
+				->file( __DIR__ . '/inc-type.php', $r, true )
 			;
 		} else if ( isset( $action ) && $action === 'add-new' ) {
 			$r['add_new'] = true;

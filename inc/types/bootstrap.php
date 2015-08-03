@@ -89,7 +89,7 @@ class Bootstrap {
 			Settings::getInstance();
 		}
 		if ( $this->options->get_use_types() )
-			add_action( 'setup_theme', __NAMESPACE__ . '\\Manager::getInstance' );
+			Manager::getInstance();
 	}
 
 }
@@ -97,14 +97,19 @@ class Bootstrap {
 /**
  * Test
  */
+//*
 add_filter( 'ddbbd_options_get_types', function( $value ) {
 	return [ 'ddbbd_types' ];
 } );
 
 add_filter( 'ddbbd_options_get_type', function( $value, $subkey ) {
-	return [
-		'post_type' => $subkey,
-		'args' => [ 'public' => true ],
-		'options' => [ 'permalink' => 'numeric' ]
-	];
+	if ( $subkey === 'ddbbd_types' ) {
+		return [
+			'post_type' => $subkey,
+			'args' => [ 'public' => true ],
+			'options' => [ 'permalink' => 'numeric' ]
+		];
+	}
+
 }, 10, 2 );
+//*/
