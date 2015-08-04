@@ -3,26 +3,45 @@ namespace DDBBD\Types;
 
 class Post_Type extends Type {
 
+	/**
+	 * Singleton pattern
+	 *
+	 * @uses DDBBD\Singleton
+	 */
 	use \DDBBD\Singleton;
 
-	protected function __construct() {
-		parent::__construct();
-		$this->init();
-	}
+	protected static $regexp = '/\A[a-z][a-z0-9_]{0,18}[a-z0-9]\z/';
 
-	private function init() {
-		add_filter( 'ddbbd_types_register_post_type_name', [ &$this, 'filter_name' ], 10, 3 );
-	}
+	private static $arguments = [
+		'name',
+		'post_type_singular',
+		'post_type_plural',
+		'singular_label',
+		'plural_label',
+		'features',
+		'rewrite_options',
+		'public',
+		'public_in_admin',
+		'supports',
+	];
 
-	public function filter_name( $name, $args, $options ) {
-		static $regexp = [ 'regexp' => '/\A[a-z][a-z0-9_\-]*[a-z0-9]\z/' ];
-		if ( ! $name = filter_var( $name, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
-			return null;
-		if ( strlen( $name ) > 20 )
-			return null;
-		if ( in_array( $name, self::$black_list, true ) )
-			return null;
-		return $name;
+	private static $default_arguments = [
+		'name'               => '',
+		'post_type_singular' => '',
+		'post_type_plural'   => '',
+		'singular_label'     => '',
+		'plural_label'       => '',
+		'features'           => [],
+		'rewrite_options'    => [],
+		'public'             => false,
+		'public_in_admin'    => true,
+		'supports'           => false
+	];
+
+	public function __construct( Array $args ) {
+		foreach ( self::$arguments as $param ) {
+			//
+		}
 	}
 
 }

@@ -50,7 +50,7 @@ class Options {
 	 * @param  string|callable $sanitize
 	 * @return void
 	 */
-	public function add( $option_name, $filter = null ) {
+	public function def( $option_name, $filter = null ) {
 		$regexp = [ 'regexp' => '/\A[a-z0-9_]+\z/' ];
 		if ( ! $option_name = filter_var( $option_name, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
 			return;
@@ -234,7 +234,7 @@ class Options {
 			if ( ! $subkey )
 				return $value;
 		}
-		return apply_filters( $this->prefix . 'options_pre_update_' . $key, $value, $old_value, $subkey );
+		return apply_filters( $this->prefix . 'options_pre_update', $value, $key, $subkey, $old_value );
 	}
 
 }

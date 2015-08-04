@@ -41,29 +41,29 @@ class Bootstrap {
 	 * @access private
 	 */
 	protected function __construct() {
-		$this->add_options();
+		$this->define_options();
 		register_activation_hook( DDBBD_TYPES_FILE, [ &$this, '_activation' ] );
 		register_deactivation_hook( DDBBD_TYPES_FILE, [ &$this, '_deactivation' ] );
 		$this->init();
 	}
 
-	private function add_options() {
+	private function define_options() {
 		$this->options = _ddbbd_options();
 
 		/**
 		 *
 		 */
-		$this->options->add( 'use_types', 'boolean' );
+		$this->options->def( 'use_types', 'boolean' );
 
 		/**
 		 *
 		 */
-		$this->options->add( 'types' );
+		$this->options->def( 'types' );
 
 		/**
 		 *
 		 */
-		$this->options->add( 'type' );
+		$this->options->def( 'type' );
 	}
 
 	/**
@@ -107,7 +107,7 @@ add_filter( 'ddbbd_options_get_type', function( $value, $subkey ) {
 		return [
 			'post_type' => $subkey,
 			'args' => [ 'public' => true ],
-			'options' => [ 'permalink' => 'numeric' ]
+			'options' => [ /*'permalink' => 'numeric'*/ ]
 		];
 	}
 
