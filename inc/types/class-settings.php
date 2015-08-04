@@ -55,7 +55,7 @@ class Settings {
 			$r['add_new'] = true;
 			$page
 				->title( __( 'Add Custom Type', 'ddbbd' ) )
-				->file( DDBBD_TYPES_INC . '/inc-type.php', $r, true )
+				->file( DDBBD_TYPES_DIR . '/inc/inc-type.php', $r, true )
 			;
 		} else {
 			$page->callback( [ &$this, 'render_types_list_table' ] );
