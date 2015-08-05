@@ -35,7 +35,7 @@ if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
 if ( ! _ddbbd_plugin_requirements( __FILE__ ) )
 	return;
 
-if ( ! class_exists( 'DDBBD\\ClassLoader' ) )
-	require_once 'lib/classloader.php';
+_ddbbd_register_cl( 'DDBBD', DDBBD_TYPES_DIR . '/lib' );
+_ddbbd_register_cl( 'DanaDonBoomBoomDoo', DDBBD_TYPES_DIR . '/inc', [ 'file_prefix' => 'class-' ] );
 
-require_once 'inc/bootstrap.php';
+require_once 'inc/bootstrap-types.php';

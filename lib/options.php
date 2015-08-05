@@ -3,6 +3,10 @@ namespace DDBBD;
 
 /**
  * Dana Don-Boom-Boom-Doo WP Options API interface
+ *
+ * @package    WordPress
+ * @subpackage DDBBD
+ * @author     Toshimichi Mimoto <mimosafa@gmail.com>
  */
 class Options {
 
@@ -39,14 +43,15 @@ class Options {
 
 		$this->prefix = $prefix;
 		$this->cache_group = $prefix . 'cache_group';
-
 		add_filter( 'pre_update_option', [ &$this, '_pre_update_option' ], 10, 3 );
 	}
 
 	/**
+	 * Define option
+	 *
 	 * @access public
 	 *
-	 * @param  string $option_name
+	 * @param  string          $option_name
 	 * @param  string|callable $sanitize
 	 * @return void
 	 */
@@ -64,52 +69,67 @@ class Options {
 	}
 
 	/**
-	 * Option interface
+	 * Add filter triggered pre update option
 	 *
 	 * @access public
+	 *
+	 * @param  string   $key
+	 * @param  callable $filter_function
+	 * @param  int      $priority
+	 * @return void
 	 */
-	public function __call( $name, $args ) {
-		if ( ! $this->keys )
-			return;
-
-		if ( substr( $name, 0, 4 ) === 'get_' ) :
-			/**
-			 * @uses DDBBD\Options::get()
-			 */
-			array_unshift( $args, substr( $name, 4 ) );
-			return call_user_func_array( [ &$this, 'get' ], $args );
-
-		elseif ( substr( $name, 0, 7 ) === 'update_' ) :
-			/**
-			 * @uses DDBBD\Options::update()
-			 */
-			array_unshift( $args, substr( $name, 7 ) );
-			return call_user_func_array( [ &$this, 'update' ], $args );
-
-		elseif ( substr( $name, 0, 7 ) === 'delete_' ) :
-			/**
-			 * @uses DDBBD\Options::delete()
-			 */
-			return call_user_func_array( [ &$this, 'delete' ], $args );
-
-		endif;
+	public function pre_update_filter( $key, callable $filter_function, $priority = 10 ) {
+		if ( array_key_exists( $key, $this->keys ) )
+			add_filter( $this->prefix . 'options_pre_update_' . $key, $filter_function, $priority, 4 );
 	}
 
 	/**
+	 * Interfaces - Overwrite methods
+	 *
 	 * @access public
 	 *
-	 * @param  string $key
+	 * DDBBD\Options::verbose_{$key}() - Get full key string (stored in options table)
+	 * @return string
+	 *
+	 * DDBBD\Options::get_{$key}( [ string $subkey ] ) - Get option's value
+	 * @param  string $subkey Optional
+	 * @return string
+	 *
+	 * DDBBD\Options::update_{$key}( [ string $subkey, ] mixed $value ) - Update option's value
+	 * @param  string $subkey Optional
+	 * @param  mixed  $value
+	 * @return boolean
+	 *
+	 * DDBBD\Options::delete_{$key}( [ string $subkey ] ) - Delete option's value
+	 * @param  string $subkey Optional
+	 * @return boolean
 	 */
-	public function full_key( $key = null ) {
-		if ( ! $this->keys )
-			return null;
+	public function __call( $name, $args ) {
+		if ( $this->keys && ( $sep = strpos( $name, '_' ) ) && $sep > 2 ) {
+			$method = substr( $name, 0, $sep );
+			if ( ! method_exists( __CLASS__, $method ) )
+				return;
+			if ( ! $option_name = substr( $name, $sep + 1 ) )
+				return;
+			array_unshift( $args, $option_name );
 
-		if ( is_string( $key ) && array_key_exists( $key, $this->keys ) )
-			return $this->prefix . $key;
+			return call_user_func_array( [ &$this, $method ], $args );
+		}
+	}
 
-		if ( ! $key )
-			return array_map( function( $key ) { return $this->prefix . $key; }, array_keys( $this->keys ) );
-
+	/**
+	 * Return raw option key (With prefix)
+	 *
+	 * @param  string $key
+	 * @return string
+	 */
+	private function verbose( $key = null ) {
+		if ( $this->keys ) {
+			if ( ! $key )
+				return array_map( function( $key ) { return $this->prefix . $key; }, array_keys( $this->keys ) );
+			if ( is_string( $key ) && array_key_exists( $key, $this->keys ) )
+				return $this->prefix . $key;
+		}
 		return null;
 	}
 
@@ -199,11 +219,18 @@ class Options {
 		return delete_option( $this->prefix . $key );
 	}
 
+	/**
+	 * Sanitize filter functions
+	 *
+	 * @access private
+	 *
+	 * @param  unknown $var
+	 * @return mixed|null
+	 */
 	private function option_filter_default( $var ) {
 		$var = filter_var( $var );
 		return $var ?: null;
 	}
-
 	private function option_filter_boolean( $var ) {
 		return filter_var( $var, \FILTER_VALIDATE_BOOLEAN, \FILTER_NULL_ON_FAILURE );
 	}
@@ -234,7 +261,16 @@ class Options {
 			if ( ! $subkey )
 				return $value;
 		}
-		return apply_filters( $this->prefix . 'options_pre_update', $value, $key, $subkey, $old_value );
+
+		/**
+		 * Filter Hook: {$prefix}_options_pre_update_{$key}
+		 *
+		 * @param  mixed  $value
+		 * @param  mixed  $old_value
+		 * @param  string $subkey
+		 * @return mixed  $value
+		 */
+		return apply_filters( $this->prefix . 'options_pre_update_' . $key, $value, $old_value, $subkey );
 	}
 
 }

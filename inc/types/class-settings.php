@@ -15,19 +15,16 @@ class Settings {
 	 */
 	use D\Singleton;
 
-	/**
-	 * @var DDBBD\Options
-	 */
-	private $options;
-
 	private $actions = [ 'add-new' ];
 
 	/**
+	 * Constructor
+	 *
+	 * @access private
 	 * @uses DanaDonBoomBoomDoo\Types\INDEX
 	 */
-	protected function __construct() {
-		$this->options = _ddbbd_options();
-		if ( $this->options->get_use_types() )
+	private function __construct() {
+		if ( _ddbbd_options( 'types' )->get_active() )
 			$this->add_menu_page();
 		add_action( 'setup_theme', [ &$this, 'general_settings' ], 1000 + INDEX );
 	}
@@ -96,6 +93,7 @@ class Settings {
 	 * Dana Don-Boom-Boom-Doo plugins general settings
 	 */
 	public function general_settings() {
+		$opt = _ddbbd_options( 'types' );
 		$page = _ddbbd_settings_page();
 		if ( $page::current_cached_page() !== 'ddbbd_general_settings' ) {
 			$page->init( 'ddbbd_general_settings', __( 'Dana Don-Boom-Boom-Doo General Settings' ), __( 'Settings', 'ddbbd' ) );
@@ -106,9 +104,9 @@ class Settings {
 				->description( __( 'Every Custom Post Types, Custom Taxonomies, and Custom Endpoints will be managed as <strong>Type</strong> units.' ) )
 				->description( __( 'If you enable to use Custom Types, "Types" menu will appear.' ) )
 					->field( 'enable-custom-types', __( 'Enable Custom Types', 'ddbbd' ) )
-						->option_name( $this->options->full_key( 'use_types' ), 'checkbox' )
+						->option_name( $opt->verbose_active(), 'checkbox' )
 		;
-		do_action( '_ddbbd_types_settings_general_settings', $page, $this->options->get_use_types() );
+		do_action( '_ddbbd_types_settings_general_settings', $page, $opt->get_active() );
 	}
 
 }

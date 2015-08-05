@@ -1,11 +1,14 @@
 <?php
 /**
- * Common functions for Dana Don-Boom-Boom-Doo plugins
+ * Common functions & consts of Dana Don-Boom-Boom-Doo plugins
  *
  * @package    WordPress
  * @subpackage DDBBD
  */
 
+/**
+ * Common constants
+ */
 if ( ! defined( 'DDBBD_FUNCTIONS_INCLUDED' ) )
 	define( 'DDBBD_FUNCTIONS_INCLUDED', __FILE__ );
 
@@ -15,7 +18,23 @@ if ( ! defined( 'DDBBD_REQUWIRED_PHP_VER' ) )
 if ( ! defined( 'DDBBD_REQUWIRED_WP_VER' ) )
 	define( 'DDBBD_REQUWIRED_WP_VER', '4.1' );
 
-if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
+/**
+ * Include ClassLoader
+ */
+require_once dirname( dirname( __FILE__ ) ) . '/lib/classloader.php';
+
+/**
+ * Common functions
+ *
+ * @access private
+ */
+if (   ! function_exists( '_ddbbd_plugin_requirements' )
+	&& ! function_exists( '_ddbbd_plugin_requirements_error' )
+	&& ! function_exists( '_ddbbd_register_cl' )
+	&& ! function_exists( '_ddbbd_settings_page' )
+	&& ! function_exists( '_ddbbd_options' )
+	&& ! function_exists( '_ddbbd_nonce' )                   ) :
+
 	/**
 	 * Plugin's requirements check
 	 *
@@ -85,9 +104,7 @@ if ( ! function_exists( '_ddbbd_plugin_requirements' ) ) {
 		}
 		return true;
 	}
-}
 
-if ( ! function_exists( '_ddbbd_plugin_requirements_error' ) ) {
 	/**
 	 * Print error
 	 */
@@ -100,9 +117,7 @@ if ( ! function_exists( '_ddbbd_plugin_requirements_error' ) ) {
 		}
 		deactivate_plugins( $_ddbbd_deactivate_plugins, true );
 	}
-}
 
-if ( ! function_exists( '_ddbbd_register_classloader' ) ) {
 	/**
 	 * Register ClassLoader
 	 *
@@ -110,15 +125,12 @@ if ( ! function_exists( '_ddbbd_register_classloader' ) ) {
 	 * @param  string $path
 	 * @return void
 	 */
-	function _ddbbd_register_classloader( $namespace, $path, $options = null ) {
+	function _ddbbd_register_cl( $namespace, $path, $options = null ) {
 		$options = is_array( $options ) ? $options : array();
 		$options = array_merge( $options, array( 'hyphenate_classname' => true ) );
-		if ( class_exists( 'DDBBD\\ClassLoader' ) )
-			DDBBD\ClassLoader::register( $namespace, $path, $options );
+		DDBBD\ClassLoader::register( $namespace, $path, $options );
 	}
-}
 
-if ( ! function_exists( '_ddbbd_settings_page' ) ) {
 	/**
 	 * Return 'Dana Don-Boom-Boom-Doo' plugin's settings page instance
 	 *
@@ -137,23 +149,22 @@ if ( ! function_exists( '_ddbbd_settings_page' ) ) {
 		}
 		return $instance;
 	}
-}
 
-if ( ! function_exists( '_ddbbd_options' ) ) {
 	/**
 	 * Return 'Dana Don-Boom-Boom-Doo' plugin's option instance
 	 *
 	 * @return DDBBD\Options
 	 */
-	function _ddbbd_options() {
-		static $instance;
-		if ( ! $instance )
-			$instance = new DDBBD\Options( 'ddbbd_' );
-		return $instance;
+	function _ddbbd_options( $context = '' ) {
+		static $instances = [];
+		if ( ! isset( $instances[$context] ) ) {
+			$prefix  = 'ddbbd_';
+			$prefix .= $context ? $context . '_' : '';
+			$instances[$context] = new DDBBD\Options( $prefix );
+		}
+		return $instances[$context];
 	}
-}
 
-if ( ! function_exists( '_ddbbd_nonce' ) ) {
 	/**
 	 * Return 'Dana Don-Boom-Boom-Doo' plugin's nonce instance
 	 *
@@ -164,4 +175,5 @@ if ( ! function_exists( '_ddbbd_nonce' ) ) {
 			return null;
 		return DDBBD\Nonce::getInstance( $context );
 	}
-}
+
+endif;

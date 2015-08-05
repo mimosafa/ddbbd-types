@@ -13,18 +13,12 @@ class Manager {
 	use \DDBBD\Singleton;
 
 	/**
-	 * @var DDBBD\Options
-	 */
-	private $options;
-
-	/**
 	 * @var array
 	 */
 	private $types;
 
 	protected function __construct() {
-		$this->options = _ddbbd_options();
-		if ( $this->types = $this->options->get_types() )
+		if ( $this->types = _ddbbd_options( 'types' )->get_types() )
 			add_action( 'setup_theme', [ &$this, 'init' ] );
 	}
 
@@ -32,8 +26,9 @@ class Manager {
 		if ( ! doing_action( 'setup_theme' ) || ! is_array( $this->types ) )
 			return;
 
+		$opt = _ddbbd_options( 'types' );
 		foreach ( $this->types as $type ) {
-			if ( $type_args = $this->options->get_type( $type ) )
+			if ( $type_args = $opt->get_type( $type ) )
 				$this->represent( $type_args );
 		}
 	}
