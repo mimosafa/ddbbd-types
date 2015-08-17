@@ -140,7 +140,6 @@ if (   ! function_exists( '_ddbbd_plugin_requirements' )
 		static $instance;
 		if ( ! $instance ) {
 			$instance = new DDBBD\Settings_Page( 'ddbbd', '', __( 'Dana Don-Boom-Boom-Doo', 'ddbbd' ) );
-			$instance->set_options( _ddbbd_options() );
 			/**
 			 * Q: Why 'load_textdomain' ?
 			 * A: It's called between 'setup_theme' to 'after_setup_theme'.
@@ -156,13 +155,9 @@ if (   ! function_exists( '_ddbbd_plugin_requirements' )
 	 * @return DDBBD\Options
 	 */
 	function _ddbbd_options( $context = '' ) {
-		static $instances = [];
-		if ( ! isset( $instances[$context] ) ) {
-			$prefix  = 'ddbbd_';
-			$prefix .= $context ? $context . '_' : '';
-			$instances[$context] = new DDBBD\Options( $prefix );
-		}
-		return $instances[$context];
+		if ( $context && ( is_array( $context ) || is_object( $context ) ) )
+			return null;
+		return DDBBD\Options::getInstance( 'ddbbd_' . $context );
 	}
 
 	/**

@@ -32,17 +32,33 @@ class Options {
 	private $keys = [];
 
 	/**
+	 * @var array { @type DDBBD\Options }
+	 */
+	private static $instances = [];
+
+	/**
+	 * @access public
+	 *
+	 * @param  string $context
+	 * @return DDBBD\Nonce
+	 */
+	public static function getInstance( $context ) {
+		$regexp = [ 'options' => [ 'regexp' => '/\A[a-z0-9_]{1,62}\z/' ] ];
+		if ( ! filter_var( $context, \FILTER_VALIDATE_REGEXP, $regexp ) )
+			return;
+		if ( ! isset( self::$instances[$context] ) )
+			self::$instances[$context] = new self( $context );
+		return self::$instances[$context];
+	}
+
+	/**
 	 * Constructor
 	 *
-	 * @access public
+	 * @access private
 	 */
-	public function __construct( $prefix ) {
-		$regexp = [ 'regexp' => '/\A[a-zA-Z0-9][a-zA-Z0-9_]*_\z/' ];
-		if ( ! $prefix = filter_var( $prefix, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
-			return;
-
-		$this->prefix = $prefix;
-		$this->cache_group = $prefix . 'cache_group';
+	private function __construct( $context ) {
+		$this->prefix = $context . '_';
+		$this->cache_group = $this->prefix . 'cache_group';
 		add_filter( 'pre_update_option', [ &$this, '_pre_update_option' ], 10, 3 );
 	}
 
@@ -56,11 +72,14 @@ class Options {
 	 * @return void
 	 */
 	public function def( $option_name, $filter = null ) {
-		$regexp = [ 'regexp' => '/\A[a-z0-9_]+\z/' ];
-		if ( ! $option_name = filter_var( $option_name, \FILTER_VALIDATE_REGEXP, [ 'options' => $regexp ] ) )
+		$regexp = [ 'options' => [ 'regexp' => '/\A[a-z0-9_]+\z/' ] ];
+		if ( ! filter_var( $option_name, \FILTER_VALIDATE_REGEXP, $regexp ) )
 			return;
+		if ( strlen( $this->prefix . $option_name ) > 64 )
+			return;
+
 		if ( $filter ) {
-			if ( method_exists( __CLASS__, 'option_filter_' . $filter ) )
+			if ( is_string( $filter ) && method_exists( __CLASS__, 'option_filter_' . $filter ) )
 				$filter_cb = [ &$this, 'option_filter_' . $filter ];
 			else if ( is_callable( $filter ) )
 				$filter_cb = $filter;

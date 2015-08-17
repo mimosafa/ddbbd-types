@@ -16,7 +16,7 @@ class Types_List_Table extends \WP_List_Table {
 	 * @access public
 	 */
 	public function __construct() {
-		$this->options = _ddbbd_options();
+		$this->options = _ddbbd_options( 'types' );
 
 		parent::__construct( [
 			'singular' => 'ddbbd_type',

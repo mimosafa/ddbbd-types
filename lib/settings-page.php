@@ -22,13 +22,6 @@ namespace DDBBD;
 class Settings_Page {
 
 	/**
-	 * DDBBD Options instance
-	 *
-	 * @var DDBBD\Options
-	 */
-	private $options;
-
-	/**
 	 * Top level page
 	 *
 	 * @var string
@@ -81,13 +74,6 @@ class Settings_Page {
 	public function __construct( $page = null, $page_title = null, $menu_title = null ) {
 		self::$page = self::$section = self::$field = [];
 		$this->init( $page, $page_title, $menu_title );
-	}
-
-	/**
-	 *
-	 */
-	public function set_options( Options $options ) {
-		$this->options = $options;
 	}
 
 	/**
